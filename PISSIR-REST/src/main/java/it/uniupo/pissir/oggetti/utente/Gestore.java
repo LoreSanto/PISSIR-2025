@@ -35,3 +35,8 @@ public class Gestore extends Utente{
         }
     }
 }
+
+/**
+ *  Da rivedere organizzazione tra utente ed utilizzatore
+ */
+

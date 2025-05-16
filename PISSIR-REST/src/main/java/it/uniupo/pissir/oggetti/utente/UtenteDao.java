@@ -39,7 +39,9 @@ public class UtenteDao {
     }
 
     //aggiunge un utente al database
-    public void addUtente(Utente utente){}
+    public static Utilizzatore addUtente(Utilizzatore utente){
+        return null;
+    }
 
     //rimuove un utente dal database
     public void deleteUtente(int idUtente){}
