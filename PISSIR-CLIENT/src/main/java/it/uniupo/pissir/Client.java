@@ -21,6 +21,5 @@ public class Client {
         Spark.get("/registrazione", RegistrazioneController.serveRegistrazionePage);//serve la pagina di registrazione
         Spark.put("/registrazione", RegistrazioneController.handleRegistrazionePut);//gestisce la registrazione dell'utente
 
-
     }
 }
