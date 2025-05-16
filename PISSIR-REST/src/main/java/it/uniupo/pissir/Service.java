@@ -25,6 +25,22 @@ public class Service {
             response.header("Access-Control-Allow-Headers", "Content-Type");
         });
 
+
+        //Ottieni singolo utente (da rivedere)
+        /*get(baseURL + "/utente", "application/json", (req, res) -> {
+            System.out.println("GET UTENTE");
+
+            String mail = req.queryParams("mail");
+            Utilizzatore utente = UtenteDao.getUtenteByEmail(mail);
+
+            if(utente == null)
+                halt(404);
+
+            res.type("application/json");
+            return utente;
+        },gson::toJson);*/
+
+
         //aggiunta di un nuovo utente
         put(baseURL + "/utente", "application/json", (req, res)->{
             System.out.println("PUT UTENTE");
