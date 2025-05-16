@@ -1,0 +1,2 @@
+rootProject.name = 'PISSIR-COMPLETO'
+include 'PISSIR-CLIENT', 'PISSIR-REST'
