@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DbConnect {
     //Inserimento variabili per la locazione del database
-    private static final String dbLoc = "jdbc:sqlite:/Codice/Interfaccia/DataBase/database.db";
+    private static final String dbLoc = "jdbc:sqlite:src/main/resources/database.db";
     private static DbConnect instance = null;
 
     private DbConnect() {
