@@ -1,0 +1,31 @@
+<section class="container my-5 impostazioni-form">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow p-4">
+                <h2 class="text-center mb-4">Accedi a Mobishare</h2>
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cognome" class="form-label">Cognome</label>
+                        <input type="text" class="form-control" id="cognome" name="cognome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Registrati</button>
+                    </div>
+                    <!--<p class="text-center mt-3">Non sei registrato? <a href="/register">Registrati qui</a></p>-->
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
