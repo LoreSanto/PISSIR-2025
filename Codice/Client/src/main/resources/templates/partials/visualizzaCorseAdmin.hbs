@@ -1,0 +1,106 @@
+<section>
+    <div class="container mt-4 mb-5">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center py-3">
+                <h2 class="card-title-main">Monitoraggio Corse Effettuate</h2>
+            </div>
+        </div>
+
+        <div class="row mb-4 g-3">
+            <div class="col-md-4">
+                <div class="card card-stats shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <p class="card-text text-muted">Totale Corse</p>
+                        <h3 id="stat-total-trips">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-stats shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <p class="card-text text-muted">Incasso Totale</p>
+                        <h3 id="stat-total-revenue">€0.00</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-stats shadow-sm h-100">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <p class="card-text text-muted">Durata Media Corse</p>
+                        <h3 id="stat-avg-duration">0 min</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="text" id="searchInput" class="form-control shadow-sm mb-4" placeholder="Cerca utente, mezzo, parcheggio...">
+
+        <div class="card shadow-sm mb-4 filter-section">
+            <div class="card-body">
+                <div class="row gy-3 gx-3 align-items-end">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <label for="filterVehicleTypeTrips" class="form-label visually-hidden">Tipo Mezzo</label>
+                        <select id="filterVehicleTypeTrips" class="form-select">
+                            <option value="">Tutti i Tipi Mezzo</option>
+                            <option value="BICICLETTA">Bicicletta</option>
+                            <option value="BICI_ELETTRICA">Bici Elettrica</option>
+                            <option value="MONOPATTINO">Monopattino Elettrico</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label for="filterStartParkingTrips" class="form-label visually-hidden">Parcheggio Partenza</label>
+                        <select id="filterStartParkingTrips" class="form-select">
+                            <option value="">Tutti i Parcheggi Partenza</option>
+                            <option value="Parcheggio A">Parcheggio A</option>
+                            <option value="Parcheggio B">Parcheggio B</option>
+                            <option value="Parcheggio C">Parcheggio C</option>
+                            <option value="Parcheggio D">Parcheggio D</option>
+                            <option value="Parcheggio E">Parcheggio E</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label for="filterEndParkingTrips" class="form-label visually-hidden">Parcheggio Arrivo</label>
+                        <select id="filterEndParkingTrips" class="form-select">
+                            <option value="">Tutti i Parcheggi Arrivo</option>
+                            <option value="Parcheggio A">Parcheggio A</option>
+                            <option value="Parcheggio B">Parcheggio B</option>
+                            <option value="Parcheggio C">Parcheggio C</option>
+                            <option value="Parcheggio D">Parcheggio D</option>
+                            <option value="Parcheggio E">Parcheggio E</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="reset-filters-button" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-undo"></i> <span class="d-none d-lg-inline">Reset</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="sticky-top">
+                        <tr>
+                            <th class="first-th">ID Corsa</th>
+                            <th>Utente</th>
+                            <th>Mezzo ID</th>
+                            <th>Tipo Mezzo</th>
+                            <th>Durata</th>
+                            <th>Costo</th>
+                            <th>P. Partenza</th>
+                            <th>P. Arrivo</th>
+                            <th class="last-th">Data</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tripsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noTripsMessage" class="text-center p-3" style="display: none;">Nessuna corsa trovata.</div>
+            </div>
+        </div>
+    </div>
+</section>

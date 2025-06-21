@@ -1,0 +1,109 @@
+
+#searchInput{
+    /* Dimensioni e spaziatura interna */
+    margin-bottom: 10px; /* Spazio sotto l'input */
+    padding: 12px 20px; /* Aumenta il padding per un aspetto più moderno */
+    font-size: 16px; /* Dimensione del font leggibile */
+    border-radius: 10px; /* Bordi arrotondati per un look "pill-shape" */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transizione fluida per focus */
+    width: 100%; /* Occupa tutta la larghezza disponibile del contenitore */
+    box-sizing: border-box; /* Include padding e border nel width/height totale */
+    background-color: #fff; /* Sfondo bianco */
+    color: #495057; /* Colore del testo scuro */
+    border: none;
+}
+
+/* Stile per il placeholder */
+#searchInput::placeholder {
+    color: #6c757d; /* Colore del placeholder leggermente più chiaro del testo */
+    opacity: 1; /* Assicura che il placeholder sia visibile */
+}
+
+/* Stile quando l'input è in focus */
+#searchInput:focus {
+    border-color: #69c77f; /* Verde più chiaro per bordo focus */
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, .25); /* Glow verde */
+}
+
+.table th{
+    background-color: #1a9d60;
+    color: white;
+}
+.first-th{
+    border-top-left-radius: 10px;
+
+}
+.last-th{
+    border-top-right-radius: 10px;
+}
+.table th, .table td {
+    vertical-align: middle;
+}
+.status-badge {
+    padding: 0.35em 0.65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+}
+.status-attivo {
+    background-color: #28a745; /* Green */
+}
+.status-sospeso {
+    background-color: #dc3545; /* Red */
+}
+.btn-toggle-status {
+    min-width: 120px;
+}
+
+.page-title {
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+}
+.stat-item {
+    text-align: center;
+}
+.stat-item h5 {
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+    color: #495057;
+}
+.stat-item p { /* Stile di default per i conteggi, colore verde per gli attivi */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+.stat-item p.sospesi { /* Colore rosso per i sospesi */
+    color: #dc3545;
+}
+.stat-item p.totali { /* Colore blu per il totale */
+    color: #007bff;
+}
+.filters-container {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.filters-container .form-control {
+    flex-grow: 1;
+    min-width: 200px;
+}
+.filters-container .btn-group .btn {
+    border-radius: 0.25rem;
+}

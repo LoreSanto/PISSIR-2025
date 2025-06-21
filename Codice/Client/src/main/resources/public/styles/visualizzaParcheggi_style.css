@@ -1,0 +1,27 @@
+.availability-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: .25rem;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+}
+.availability-bar {
+    height: 100%;
+    background-color: #28a745; /* Verde per posti disponibili */
+    transition: width 0.3s ease-in-out;
+    text-align: center;
+    color: white;
+    font-size: 0.75rem;
+    line-height: 20px;
+    font-weight: bold;
+}
+.availability-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 0.75rem;
+    color: #333; /* Colore testo sopra la barra */
+    font-weight: 500;
+}

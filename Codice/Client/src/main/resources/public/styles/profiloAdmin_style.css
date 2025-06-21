@@ -1,0 +1,12 @@
+.admin-panel-header {
+    background-color: #ffffff;
+    padding: 2rem 0;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 25px;
+    font-weight: bold;
+    margin: 0 auto 2rem;
+}
+.admin-panel-header h1 {
+    color: #343a40;
+}
+

@@ -1,0 +1,58 @@
+<section>
+    <main class="container flex-grow-1 py-4" id="visualizzaMezzi">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-body-emphasis">Mezzi Disponibili</h1>
+            <p class="text-muted mt-2">Seleziona un mezzo e inizia il tuo viaggio!</p>
+        </div>
+
+        <div class="mb-4 p-4 bg-white rounded-3 shadow-lg">
+            <h2 class="h5 fw-semibold text-dark mb-3">Filtra Risultati</h2>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="filter-type" class="form-label fw-medium">Tipo di Mezzo:</label>
+                    <div id="filter-type-buttons" class="btn-group filter-button-group w-100" role="group" aria-label="Filtra per tipo">
+                        <button type="button" class="btn btn-outline-secondary active" data-filter-type="all">Tutti</button>
+                        <button type="button" class="btn btn-outline-secondary" data-filter-type="BICICLETTA"><i class="fas fa-bicycle me-1"></i>Bici</button>
+                        <button type="button" class="btn btn-outline-secondary" data-filter-type="BICI_ELETTRICA"><i class="fas fa-bolt me-1"></i>Bici Elettriche</button>
+                        <button type="button" class="btn btn-outline-secondary" data-filter-type="MONOPATTINO"><i class="bi bi-scooter"></i> Monopattini</button>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="filter-zone" class="form-label fw-medium">Zona:</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="filter-zone-button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tutte le Zone
+                        </button>
+                        <ul id="filter-zone-options" class="dropdown-menu w-100" aria-labelledby="filter-zone-button">
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="filter-parking" class="form-label fw-medium">Parcheggio:</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="filter-parking-button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tutti i Parcheggi
+                        </button>
+                        <ul id="filter-parking-options" class="dropdown-menu w-100" aria-labelledby="filter-parking-button">
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button id="reset-filters-button" class="btn btn-outline-danger w-100">
+                        <i class="fas fa-undo"></i> <span class="d-none d-lg-inline">Reset</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="vehicle-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 ">
+        </div>
+        <div id="no-results" class="d-none text-center text-muted mt-5">
+            <i class="fas fa-search fa-3x mb-3"></i>
+            <p class="h4">Nessun mezzo trovato per i filtri selezionati.</p>
+        </div>
+    </main>
+</section>
+

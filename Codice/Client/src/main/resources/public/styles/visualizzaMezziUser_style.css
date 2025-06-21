@@ -1,0 +1,44 @@
+#visualizzaMezzi{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.selection-card {
+    border-radius: 0.75rem; /* 12px */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+.selection-card:hover {
+    transform: translateY(-5px);
+}
+
+.filter-button-group .btn {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+.filter-button-group .btn.active {
+    background-color: #198754;
+    color: white;
+    border-color: #198754;
+}
+.filter-button-group .btn:not(.active):hover {
+    background-color: #e9ecef;
+}
+
+.rent-button {
+    background-color: #ffc107; /* Yellow color like "Ricarica" */
+    color: #212529; /* Dark text for yellow button */
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.rent-button:hover {
+    background-color: #e0a800;
+}
+.vehicle-image {
+    width: 100%;
+    height: 150px; /* Fixed height for images */
+    object-fit: cover; /* Ensures images cover the area without distortion */
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}

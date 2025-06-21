@@ -1,0 +1,45 @@
+<section class="container my-5 impostazioni-form">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="registration-form-container">
+                <h2 class="text-center fw-bold fs-2 mb-4 text-success">Crea il tuo Account</h2>
+                <p class="text-center text-muted mb-4">Unisciti a Mobishare e inizia a muoverti in modo smart!</p>
+                <form id="registrationForm" method="POST" action="/register">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">Nome</label>
+                            <input type="text" class="form-control form-control-lg" id="nome" name="nome" required>
+                        </div>
+
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label for="lastName" class="form-label">Cognome</label>
+                            <input type="text" class="form-control form-control-lg" id="cognome" name="cognome" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Indirizzo Email</label>
+                        <input type="email" class="form-control form-control-lg" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password" required>
+                        <div id="passwordHelp" class="form-text">La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.</div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-custom-green btn-lg fw-semibold">Registrati</button>
+                    </div>
+                    <p class="text-center mt-4">Hai già un account? <a href="/login" class="text-success fw-medium">Accedi qui</a>.</p>
+                </form>
+
+                {{#if errorMessage}}
+                    <div class="alert alert-danger">{{errorMessage}}</div>
+                {{/if}}
+
+            </div>
+        </div>
+    </div>
+</section>

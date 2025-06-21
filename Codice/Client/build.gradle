@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    //Senza questo non funziona
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    //runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'//fa vedere i log
+
+    implementation group:'com.google.code.gson', name:'gson', version:'2.10.1'
+
+    implementation 'com.sparkjava:spark-core:2.9.4'
+
+    implementation 'com.sparkjava:spark-template-handlebars:2.7.1'
+
+    //Permette di utilizzare RestTemplate
+    implementation 'org.springframework:spring-web:5.1.5.RELEASE'
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass = 'it.uniupo.pissir.Client'
+}

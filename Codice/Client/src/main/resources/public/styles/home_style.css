@@ -1,0 +1,63 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+}
+
+section{
+    flex-grow: 1;
+}
+
+.hero {
+    background-image: url('../banner-home.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 20rem;
+    text-shadow: 1px 1px 4px #000;
+}
+
+.placeholder-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #e0f2f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: #00796b;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+.selection-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.selection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.btn-custom-green {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+.btn-custom-green:hover {
+    background-color: #157347;
+    border-color: #146c43;
+    color: white;
+}
+
+.text-shadow-custom {
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.impostazioni-form{
+    padding-top: 8%;
+    padding-bottom: 5%;
+}
