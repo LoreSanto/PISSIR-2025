@@ -33,7 +33,7 @@ async function caricaEProcessaDatiCorsa() {
             const datePartenza = new Date(corsa.dataPartenza);
             const dateArrivo = new Date(corsa.dataArrivo);
             const diffMs = dateArrivo - datePartenza;
-            const durata = diffMs / (1000 * 60);
+            const durata = parseFloat((diffMs / (1000 * 60)).toFixed(2));//cambiato per gestire meglio la visualizzazione
 
             return {
                 id: corsa.id,
@@ -90,6 +90,20 @@ function formatDate(dateString) {
     }
 }
 
+function formatDuration(minutes) {
+    const totalSeconds = Math.round(minutes * 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutesRemainder = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    let result = '';
+    if (hours > 0) result += `${hours}h `;
+    if (minutesRemainder > 0 || hours > 0) result += `${minutesRemainder}m `;
+    result += `${seconds}s`;
+
+    return result.trim();
+}
+
 // --- Render Functions ---
 function renderTripsTable(filteredTrips) {
     tripsTableBody.innerHTML = '';
@@ -107,7 +121,7 @@ function renderTripsTable(filteredTrips) {
                     <td>${trip.id}</td>
                     <td>${trip.vehicleId}</td>
                     <td>${formatVehicleType(trip.vehicleType)}</td> 
-                    <td>${trip.durationMinutes} min</td>
+                    <td>${formatDuration(trip.durationMinutes)}</td>
                     <td>${formatCurrency(trip.costEur)}</td>
                     <td>${trip.startParking}</td>
                     <td>${trip.endParking}</td>

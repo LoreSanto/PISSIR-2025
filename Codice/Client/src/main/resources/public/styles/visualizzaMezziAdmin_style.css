@@ -127,3 +127,55 @@
 .form-check-input:disabled {
     cursor: not-allowed; /* Cursore non permesso sulla checkbox disabilitata */
 }
+
+.modal-header, .add-vehicle-spot{
+    background-color: #198754;
+    color: white;
+}
+
+.add-vehicle-spot:hover{
+    background-color: #eef2f3;
+    border-color: #198754;
+}
+
+#addVehicleButton{
+    background-color: #198754;
+    color: white;
+}
+
+
+.vehicle-option:hover {
+    border-color: #2E7D32;
+    color: #2E7D32;
+}
+.vehicle-option.selected {
+    border-color: #2E7D32;
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2E7D32;
+    font-weight: bold;
+    box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+}
+
+.vehicle-option {
+    /* Imposta Flexbox per allineare gli elementi figli */
+    display: flex;
+    /* Allinea gli elementi figli in colonna (uno sopra l'altro) */
+    flex-direction: column;
+    /* Centra gli elementi verticalmente */
+    justify-content: center;
+    /* Centra gli elementi orizzontalmente */
+    align-items: center;
+    /* Aggiunge stile per la visualizzazione */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 150px; /* Larghezza del contenitore */
+    height: 100px; /* Altezza del contenitore */
+    text-align: center;
+    cursor: pointer;
+    font-family: sans-serif;
+}
+
+.material-symbols-outlined {
+    font-size: 2.3rem; /* Dimensione dell'icona */
+}

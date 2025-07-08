@@ -105,7 +105,7 @@ function renderTripsTable(filteredTrips) {
                     <td>${trip.userName || trip.userId}</td>
                     <td>${trip.vehicleId}</td>
                     <td>${formatVehicleType(trip.vehicleType)}</td> 
-                    <td>${trip.durationMinutes} min</td>
+                    <td>${formatDuration(trip.durationMinutes)}</td>
                     <td>${formatCurrency(trip.costEur)}</td>
                     <td>${trip.startParking}</td>
                     <td>${trip.endParking}</td>
@@ -169,6 +169,20 @@ function populateParkingFilters() {
         option.textContent = spot;
         filterEndParkingTrips.appendChild(option);
     });
+}
+
+function formatDuration(minutes) {
+    const totalSeconds = Math.round(minutes * 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutesRemainder = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    let result = '';
+    if (hours > 0) result += `${hours}h `;
+    if (minutesRemainder > 0 || hours > 0) result += `${minutesRemainder}m `;
+    result += `${seconds}s`;
+
+    return result.trim();
 }
 
 // --- Initial Setup ---

@@ -1,0 +1,205 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #eef2f3; /* Light grey background */
+}
+
+.main-content {
+    flex: 1;
+    padding: 2.5rem 0;
+}
+
+.ride-details-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    overflow: hidden; /* Ensures child elements conform to border-radius */
+    background-color: #fff;
+}
+.corsa-image-container {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+.corsa-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.details-container {
+    padding: 2.5rem;
+}
+.details-header {
+    font-weight: 600;
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    color: #343a40;
+}
+
+
+
+/* Info Box Style */
+.info-box {
+    background-color: #f8f9fa;
+    border-radius: .75rem;
+    padding: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-box .info-icon {
+    color: #2e8b57;
+}
+.info-box .info-label {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+.info-box .info-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.modal-content {
+    border-radius: .75rem;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    color: #343a40;
+    padding: 1rem 1.5rem;
+}
+.modal-header .modal-title {
+    font-weight: 600;
+}
+.modal-body {
+    padding: 2rem;
+}
+.modal-footer {
+    border-top: none;
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Custom Radio Button Toggles */
+.fault-options .form-check-input {
+    display: none; /* Hide the default radio button */
+}
+.fault-options .form-check-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .75rem 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Style for the 'No' option when not selected */
+#faultNo + label {
+    border-color: #198754;
+    color: #198754;
+}
+#faultYes + label {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+.fault-options .form-check-input:checked + label {
+    color: #fff;
+}
+#faultNo:checked + label {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+#faultYes:checked + label {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+.price-display {
+    background-color: #f8f9fa;
+    border-radius: .5rem;
+    padding: 1rem;
+}
+.price-display .price-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+.price-display .price-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #198754;
+}
+
+/* Custom styling for the parking select dropdown */
+#parking-location {
+    border-color: #2e8b57;
+}
+#parking-location:focus {
+    border-color: #2e8b57;
+    box-shadow: 0 0 0 0.25rem rgba(46, 139, 87, 0.5);
+}
+.parking-spot:hover{
+    background-color: #2e8b57;
+}
+
+/*Style for extra*/
+#faultNo-ricarica + label,
+#faultYes-ricarica + label {
+    border: 2px solid #dee2e6;
+    border-radius: .5rem;
+    cursor: pointer;
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    color: inherit; /* fallback */
+}
+
+/* Colori NO e SÌ non selezionati */
+#faultNo-ricarica + label {
+    border-color: #198754;
+    color: #198754;
+}
+#faultYes-ricarica + label {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+/* Nascondi radio default */
+#faultNo-ricarica,
+#faultYes-ricarica {
+    display: none;
+}
+
+/* Radio selezionato: background e testo bianco */
+#faultNo-ricarica:checked + label {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+#faultYes-ricarica:checked + label {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}

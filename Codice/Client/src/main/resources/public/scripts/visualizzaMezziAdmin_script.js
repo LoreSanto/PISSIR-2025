@@ -11,6 +11,7 @@ const filterStatus = document.getElementById('filterStatus');
 const filterMalfunction = document.getElementById('filterMalfunction');
 const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 const noResultsMessage = document.getElementById('noResultsMessage');
+const addVehicleModalEl = document.getElementById('addVehicleModal');
 
 const statTotalVehicles = document.getElementById('stat-total-vehicles');
 const statAvailableVehicles = document.getElementById('stat-available-vehicles');
@@ -320,6 +321,125 @@ function populateParkingFilter() {
         option.textContent = spot;
         filterParking.appendChild(option);
     });
+}
+
+//funzione per aggiungere un nuovo veicolo
+async function handleNewVehicle(){
+    const messageDiv = document.getElementById("vehicleMessage");
+    messageDiv.innerHTML = ""; // Pulisce messaggi precedenti
+
+    // Elementi del DOM
+    const vehicleOptions = document.querySelectorAll('.vehicle-option');
+    const hiddenVehicleTypeInput = document.getElementById('vehicle-type');
+    const batteryLevelContainer = document.getElementById('battery-level-container');
+    const batteryLevelInput = document.getElementById('battery-level');
+    const addVehicleModalEl = document.getElementById('addVehicleModal');
+    const addVehicleForm = document.getElementById('add-vehicle-form');
+    const vehicleTypeError = document.getElementById('vehicle-type-error');
+    const saveVehicleBtn = document.getElementById('save-vehicle-btn');
+    const spinner = saveVehicleBtn.querySelector('.spinner-border');
+
+    const addVehicleModal = new bootstrap.Modal(addVehicleModalEl);
+
+    const handleBatteryField = () => {
+        const selectedType = hiddenVehicleTypeInput.value;
+        if (selectedType === 'BICICLETTA') {
+            batteryLevelInput.disabled = true;
+            batteryLevelInput.value = '';
+            batteryLevelInput.required = false;
+            batteryLevelContainer.style.opacity = '0.5';
+        } else {
+            batteryLevelInput.disabled = false;
+            batteryLevelInput.required = true;
+            batteryLevelContainer.style.opacity = '1';
+        }
+    };
+
+    vehicleOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            vehicleOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            hiddenVehicleTypeInput.value = option.dataset.value;
+            vehicleTypeError.classList.add('d-none');
+            handleBatteryField();
+        });
+    });
+
+    batteryLevelInput.addEventListener('input', () => {
+        if (parseInt(batteryLevelInput.value, 10) > 100) {
+            batteryLevelInput.value = 100;
+        }
+    });
+
+    addVehicleForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!hiddenVehicleTypeInput.value) {
+            vehicleTypeError.classList.remove('d-none');
+        } else {
+            vehicleTypeError.classList.add('d-none');
+        }
+
+        if (!addVehicleForm.checkValidity() || !hiddenVehicleTypeInput.value) {
+            addVehicleForm.classList.add('was-validated');
+            return;
+        }
+
+        const vehicleData = {
+            type: hiddenVehicleTypeInput.value,
+            parking: document.getElementById('parking').value,
+            imei: document.getElementById('imei').value
+        };
+        if (batteryLevelInput.required) {
+            vehicleData.battery = parseInt(batteryLevelInput.value, 10);
+        }
+
+        console.log(vehicleData);
+
+        // Mostra lo spinner e disabilita il pulsante
+        spinner.classList.remove('d-none');
+        saveVehicleBtn.disabled = true;
+
+        try {
+            // Sostituisci con l'URL del tuo endpoint API
+            const response = await fetch('http://localhost:4567/api/v1.0/addMezzo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(vehicleData)
+            });
+
+            if (response.ok) {
+                messageDiv.innerHTML = `<div class="alert alert-success">Mezzo aggiunto correttamente</div>`;
+                addVehicleModal.hide();
+                caricaEProcessaDatiMezzi();
+            } else {
+                const errorData = await response.json();
+                messageDiv.innerHTML = `<div class="alert alert-danger">Errore, Salvataggio fallito: ${errorData.message || response.statusText}</div>`;
+            }
+        } catch (error) {
+            console.error('Errore di rete:', error);
+            messageDiv.innerHTML = `<div class="alert alert-danger">Errore di Rete, Impossibile connettersi al server. Riprova più tardi.</div>`;
+        } finally {
+            // Nasconde lo spinner e riabilita il pulsante
+            spinner.classList.add('d-none');
+            saveVehicleBtn.disabled = false;
+        }
+    });
+
+    addVehicleModalEl.addEventListener('hidden.bs.modal', function () {
+        addVehicleForm.reset();
+        addVehicleForm.classList.remove('was-validated');
+        vehicleOptions.forEach(opt => opt.classList.remove('selected'));
+        hiddenVehicleTypeInput.value = '';
+        vehicleTypeError.classList.add('d-none');
+        handleBatteryField();
+    });
+
+    handleBatteryField();
 }
 
 // --- Initial Setup (Configurazione Iniziale) ---

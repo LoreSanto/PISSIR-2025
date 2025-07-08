@@ -106,7 +106,7 @@ public class MezzoController {
             System.out.println("Risposta server: " + response);
 
             // Redirect utente dopo successo
-            res.redirect("/profilo");
+            res.redirect("/corsaAttuale");
 
         } catch (Exception e) {
             e.printStackTrace();

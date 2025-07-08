@@ -60,9 +60,24 @@
                     <!-- Per fare aggiornamento del profilo
                     <form id="aggiornaProfiloForm" action="/aggiornaProfilo" method="POST" style="display: none;"></form>
                      -->
+                    <hr> <!-- Divisore visivo -->
+
+                    <!--Conversione Punti -->
+                    <h6 class="mb-3"><i class="bi bi-gift-fill"></i> Converti i tuoi Punti</h6>
+                    <p>Hai a disposizione <strong id="pointsForConversion">{{punti}}</strong> punti.</p>
+                    <p class="text-muted small">Ogni 50 punti ottieni 1€ di credito. Verranno convertiti tutti i punti possibili.</p>
+                    <div id="conversionMessage" class="mt-3"></div>
                 </div>
+
                 <div class="modal-footer">
+
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+
+                    <button type="button" class="btn btn-primary punti" onclick="handleConversion()">
+                        <i class="bi bi-arrow-repeat"></i> Converti Punti
+                    </button>
+
+
                     <button type="button" class="btn btn-success" onclick="handleRecharge()">
                         <i class="bi bi-check-circle-fill"></i> Conferma Ricarica
                     </button>

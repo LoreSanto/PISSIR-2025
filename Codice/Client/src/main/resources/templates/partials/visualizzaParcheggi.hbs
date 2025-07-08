@@ -79,4 +79,51 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Parking Button Area -->
+    <div class="text-center my-4">
+        <button class="btn btn-teal-custom btn-lg shadow- add-park-spot" data-bs-toggle="modal" data-bs-target="#addParkingModal">
+            <i class="bi bi-plus-lg me-2"></i>Aggiungi Nuovo Parcheggio
+        </button>
+    </div>
+
+    <!-- Add Parking Modal -->
+    <div class="modal fade" id="addParkingModal" tabindex="-1" aria-labelledby="addParkingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addParkingModalLabel">Aggiungi Nuovo Parcheggio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="parking-name" class="form-label">Nome Parcheggio</label>
+                            <input type="text" class="form-control" id="parking-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="max-capacity" class="form-label">Capienza Massima</label>
+                            <input type="number" class="form-control" id="max-capacity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="zone" class="form-label">Zona</label>
+                            <select class="form-select" id="zone" required>
+                                <option value="" selected disabled>Seleziona una zona...</option>
+                                <option value="Centro">Centro</option>
+                                <option value="Nord">Nord</option>
+                                <option value="Sud">Sud</option>
+                                <option value="Ovest">Ovest</option>
+                                <option value="Est">Est</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div id="parkMessage" class="mt-3"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-teal-custom" id="addParkingButton" onclick="addParkingSpot()">Salva Parcheggio</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

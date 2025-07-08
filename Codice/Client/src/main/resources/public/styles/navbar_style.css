@@ -85,11 +85,15 @@
 
 /* Stili per la modale */
 .modal-header {
-    background-color: #198754;
-    color: white;
+    background-color: #198754 !important;
+    color: white !important;
 }
 .modal-header .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.btn.btn-primary.punti{
+    background-color: #2121e7;
 }
 
 /* Stili per i link nel menu mobile */

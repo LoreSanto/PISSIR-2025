@@ -27,6 +27,14 @@ dependencies {
 
     //Spark
     implementation group: 'com.sparkjava', name: 'spark-core', version: '2.8.0'
+
+    //MQTT
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+
+    //Permette di utilizzare RestTemplate
+    implementation 'org.springframework:spring-web:5.1.5.RELEASE'
+
+
 }
 
 test {

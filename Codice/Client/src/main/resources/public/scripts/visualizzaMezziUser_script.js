@@ -165,11 +165,11 @@ function renderVehicles(vehicles) {
 function renderImage(vehicle) {
     switch (vehicle.type) {
         case 'BICICLETTA':
-            return 'bici_muscolare.jpg';
+            return 'BICICLETTA.jpg';
         case 'BICI_ELETTRICA':
-            return 'bici_elettrica.jpg';
+            return 'BICI_ELETTRICA.jpg';
         case 'MONOPATTINO':
-            return 'monopattino_elettrico.jpg';
+            return 'MONOPATTINO.jpg';
         default:
             return 'https://placehold.co/600x400/E0E0E0/757575?text=Mezzo+Non+Disponibile';
     }

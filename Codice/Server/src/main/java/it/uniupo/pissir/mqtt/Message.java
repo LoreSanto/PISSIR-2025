@@ -1,9 +1,9 @@
 package it.uniupo.pissir.mqtt;
 
-public class Messaggi {
+public class Message {
     String msg;
 
-    public Messaggi(String msg) {
+    public Message(String msg) {
         this.msg = msg;
     }
 

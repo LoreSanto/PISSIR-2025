@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static spark.Spark.*;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;//Usata per le prove di stampa del json
 import it.uniupo.pissir.oggetti.corsa.Corsa;
 import it.uniupo.pissir.oggetti.corsa.CorsaDao;
 import it.uniupo.pissir.oggetti.mezzo.*;
@@ -25,35 +26,54 @@ public class Service {
         Gson gson = new Gson();
         String baseURL = "/api/v1.0";
 
+        //Per poter accettare le richieste da qualunque dispositivo giri il client
+        //ipAddress("0.0.0.0"); // Imposta l'indirizzo IP del server
         enableCORS();
-        //Login di un utente !!!Poi modificare perchè non dovrebbe salvare la passwd in sessione sul client!!!
-        get( baseURL + "/login", (req, res) -> {
+        /*
+        * Nelle pagine JS del client bisogna modificare le richieste in questo modo:
+        *
+        * 1-Modificare l'URL di base alla macchina dove gira il server, ad esempio:
+        *
+        *   ... fetch('http://192.168.0.7:4567/api/v1.0/mezziUser');
+        *
+        * 2-Modificare l'url in maniera dinamica, ad esempio:
+        *
+        *   const backendBaseUrl = `${window.location.hostname}:4567`;
+        *   ... fetch(`http://${backendBaseUrl}/api/v1.0/mezziUser`);
+        *
+        * */
 
-            System.out.println("GET Login");
 
-            String email = req.queryParams("email");
-            String password = req.queryParams("password");
+        //Login di un utente
+        post( baseURL + "/login", (req, res) -> {
+
+            System.out.println("POST Login");
+
+            // Parso il JSON dal body
+            Map<String, String> body = new Gson().fromJson(req.body(), Map.class);
+            String email = body.get("email");
+            String password = body.get("password");
 
             String tipo = UtenteDao.getTipoUtente(email, password);
-
             System.out.println(tipo);
 
-             assert tipo != null;
-             if(tipo.equals("user")) {
-                System.out.println("GET USER");
-                Utente utente = UtenteDao.getUtenteBase(email,password,tipo);
+            if (tipo == null) {
+                res.status(401);
+                return "Login fallito";
+            }
+
+            if (tipo.equals("user")) {
+                Utente utente = UtenteDao.getUtenteBase(email, password, tipo);
                 res.status(200);
                 res.type("application/json");
                 return new Gson().toJson(utente);
-            }else if(tipo.equals("admin")) {
-                System.out.println("GET ADMIN");
+            } else if (tipo.equals("admin")) {
+                Gestore gestore = UtenteDao.getUtenteAdmin(email, password, tipo);
                 res.status(200);
-                Gestore gestore = UtenteDao.getUtenteAdmin(email,password,tipo);
                 res.type("application/json");
                 return new Gson().toJson(gestore);
-            }else{
-                System.out.println("Login fallito");
-                res.status(401); // Unauthorized
+            } else {
+                res.status(401);
                 return "Login fallito";
             }
 
@@ -170,6 +190,30 @@ public class Service {
             return new Gson().toJson(mezzi);
         });
 
+        //Aggiunge un nuovo mezzo
+        post(baseURL + "/addMezzo", (req, res) -> {
+            System.out.println("POST ADD MEZZO");
+
+            Map<String, Object> body = gson.fromJson(req.body(), Map.class);
+            String tipo = (String) body.get("type");
+            String parcheggio = (String) body.get("parking");
+            double batteria = (body.get("battery") == null)? -1 : (double) body.get("battery");
+            String codice_IMEI = (String) body.get("imei");
+
+            System.out.println("tipo: " + tipo + "parcheggio: " + parcheggio + "batteria: " + batteria + "imei: " + codice_IMEI);;
+
+            boolean successo = MezzoDao.addMezzo(tipo, (int) batteria, parcheggio, codice_IMEI);
+
+            if (successo) {
+                res.status(200); // OK
+                //res.type("text/plain");
+                return gson.toJson(new SuccessResponse("Mezzo aggiunto correttamente : "));
+            } else {
+                res.status(404); // Not Found
+                return gson.toJson("Impossibile aggiungere il mezzo: ");
+            }
+        });
+
         //Aggiorna i dati di un mezzo
         post(baseURL + "/updateMezzo", (request, response) -> {
             response.type("application/json");
@@ -216,6 +260,28 @@ public class Service {
             res.status(200); // OK
             res.type("application/json");
             return new Gson().toJson(parcheggi);
+        });
+
+        //aggiunge un nuovo parcheggio
+        post(baseURL + "/addParcheggio", (req, res) -> {
+            res.type("application/json");
+
+            Map<String, Object> body = gson.fromJson(req.body(), Map.class);
+
+            String nome = (String) body.get("nome");
+            double capienza = (double) body.get("capienzaMassima");
+            String zona = (String) body.get("zona");
+
+            boolean successo = ParcheggioDao.addParcheggio(nome, (int) capienza, zona);
+
+            if (successo) {
+                res.status(200); // OK
+                //res.type("text/plain");
+                return gson.toJson(new SuccessResponse("Parcheggio aggiunto correttamente : " + nome));
+            } else {
+                res.status(404); // Not Found
+                return gson.toJson("Impossibile aggiungere il parcheggio: " + nome);
+            }
         });
 
         //visualizza le corse per l'admin
@@ -295,24 +361,66 @@ public class Service {
             }
         });
 
+        //Conversione punti in credito
+        post(baseURL + "/conversionePunti", (req, res) -> {
+
+            System.out.println("POST CNVERSIONE PUNTI");
+
+            Map<String, Object> body = gson.fromJson(req.body(), Map.class);
+
+            String email = (String) body.get("email");
+            double punti = (double) body.get("nuoviPunti");
+            double importo = 0;
+
+            try {
+                importo = Double.valueOf(body.get("nuovoCredito").toString());
+            } catch (Exception e) {
+                res.status(400);
+                return new ErrorResponse("Errore interno del server: " + e.getMessage());
+            }
+
+            System.out.println(email + " " + punti + " " + importo);
+            boolean successo = UtenteDao.convertiPunti(email, (int) punti, importo);
+
+            if (successo) {
+                res.status(200); // OK
+                //res.type("text/plain");
+                return gson.toJson(new SuccessResponse("Importo aggiornato con successo per utente : " + email));
+            } else {
+                res.status(404); // Not Found
+                return gson.toJson("Impossibile aggiornare il credito. Utente non trovato: " + email);
+            }
+        });
+
         //Aggiorna dati User
-        get(baseURL + "/updateRicaricaUtente", (req, res) -> {
-            System.out.println("GET UPDATE USER");
+        post(baseURL + "/updateUtente", (req, res) -> {
+
+            System.out.println("POST UPDATE USER");
 
             String email = req.queryParams("email");
 
-            Utente utente = UtenteDao.getUtenteUpdateRicarica(email);
+            //richiedo dati utente per aggiornare i punti e il credito
+            Utente utente = UtenteDao.getDatiUtenteByMail(email);
 
-            if (utente!= null) {
-                res.status(200); // OK
+            if (utente != null) {
+                double credito = utente.getCredito();
+                int punti = utente.getPunti();
+                String stato = utente.getStato();
+                res.status(200);
                 res.type("application/json");
-                return new Gson().toJson(utente);
+
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("credito", credito);
+                responseMap.put("punti", punti);
+                responseMap.put("stato", stato);
+                return new Gson().toJson(responseMap);
             } else {
-                res.status(404); // Not Found
+                res.status(404);
                 return new Gson().toJson("Utente non trovato");
             }
         });
 
+        //Richiesta noleggio di un mezzo (quindi aggiungo una corsa e modifico status mezzo in "IN_USO)
         post(baseURL + "/noleggiaMezzo", (req, res) -> {
             System.out.println("POST NOLEGGIO MEZZO");
 
@@ -325,7 +433,15 @@ public class Service {
 
             if(UtenteDao.isUtenteSospeso(email)){
                 res.status(403); // Forbidden
-                return "Itente non autorizzato a noleggiare mezzi";
+                return "Utente non autorizzato a noleggiare mezzi";
+            }
+            //Controllo prima che l'utilizzatore non abbia già una corsa in corso
+            Corsa corsa = CorsaDao.getCorsaAttualeByEmail(email);
+            if(corsa!=null){
+                System.out.println("Nessuna corsa aggiunta.");
+                System.out.println("L'utilizzatore con email " + email + " ha già una corsa in corso.");
+                res.status(200);//vedere cosa è meglio restituire
+                return "L'utilizzatore ha attualmente già una corsa. Non è possibile noleggiare un altro mezzo.";
             }
 
             // Chiama DAO per aggiungere la corsa
@@ -340,9 +456,128 @@ public class Service {
                 return "Errore durante l'avvio della corsa";
             }
         });
+
+        //Restituisce il Json con i dati relativa alla corsa attuale(da usare anche quando l'utente richiede di noleggiare, ma ha una corsa attuale)
+        post(baseURL + "/corsaAttuale", (req, res) -> {
+            System.out.println("POST CORSA IN CORSO");
+
+            String email = req.queryParams("email");
+
+            Corsa corsa = CorsaDao.getCorsaAttualeByEmail(email);
+
+            if (corsa != null) {
+                res.status(200); // OK
+                res.type("application/json");
+
+                Gson gsontmp = new GsonBuilder().setPrettyPrinting().create();
+                String json = gsontmp.toJson(corsa);
+
+                //Stampo il formato del Json per debug
+                System.out.println("JSON restituito:\n" + json);
+                return new Gson().toJson(corsa);
+            } else {
+                res.status(200); // Ok, ma Json vuoto
+                return "{}";
+            }
+        });
+
+        //termina e  paga la corsa che sista effettuando (link momentaneo get di esempio: http://localhost:4567/api/v1.0/terminaCorsa?id_corsa=17&parcheggio_fine=Parcheggio%20B)
+        post(baseURL + "/terminaCorsa", (req,res) ->{
+
+            System.out.println("POST TERMINA CORSA");
+
+            int idCorsa = Integer.parseInt(req.queryParams("id_corsa"));
+            String parcheggioFine = req.queryParams("parcheggio_fine");
+            String guasto = req.queryParams("guasto");
+
+            int idMezzo = CorsaDao.terminaCorsaById(idCorsa, parcheggioFine);
+
+            if(idMezzo!=0){
+                res.status(200);
+                //Modifico lo stato del mezzo in "PRELEVABILE" o "NON_DISPONIBILE" a seconda che ci sia stato un guasto o meno
+                if ("yes".equalsIgnoreCase(guasto)) {
+                    MezzoDao.setStatusMezzo(idMezzo, "NON_DISPONIBILE");
+                } else {
+                    MezzoDao.setStatusMezzo(idMezzo, "PRELEVABILE");
+                }
+                return "Corsa terminata con successo";
+            }else{
+                res.status(404);
+                return "Corsa non trovata o già terminata";
+            }
+        });
+
+        //Parte MQTT per la gestione dei mezzi
+
+        //visualizza la batteria di un mezzo
+        get(baseURL + "/batteriaMezzo", (req, res) -> {
+            System.out.println("GET BATTERIA MEZZO");
+
+            int idMezzo = Integer.parseInt(req.queryParams("id_mezzo"));
+
+            int batteria = MezzoDao.getBatteriaById(idMezzo);
+
+            if (batteria != -1) {
+                res.status(200); // OK
+                return batteria;
+            } else {
+                res.status(404); // Not Found
+                return "Mezzo non trovato o batteria non disponibile";
+            }
+        });
+
+        // aggiorna la batteria di un mezzo
+        put(baseURL + "/batteriaMezzo", (req, res) -> {
+            System.out.println("POST BATTERIA MEZZO");
+
+            int idMezzo = Integer.parseInt(req.queryParams("id_mezzo"));
+            int nuovaBatteria = Integer.parseInt(req.queryParams("batteria"));
+
+            boolean ok = MezzoDao.aggiornaBatteria(idMezzo, nuovaBatteria);
+
+            if (ok) {
+                res.status(200);
+                return "Batteria aggiornata per il mezzo con ID " + idMezzo + ": " + nuovaBatteria + "%";
+            } else {
+                res.status(404);
+                return "Mezzo non trovato o aggiornamento fallito";
+            }
+        });
+
+        //aggiorna lo stato di un mezzo
+        put(baseURL + "/statoMezzo", (req, res) -> {
+            System.out.println("PUT STATO MEZZO");
+
+            int idMezzo = Integer.parseInt(req.queryParams("id_mezzo"));
+
+            String nuovoStato = req.queryParams("stato");
+
+
+            boolean ok = false;
+            if ("PRELEVABILE".equalsIgnoreCase(nuovoStato) || "NON_DISPONIBILE".equalsIgnoreCase(nuovoStato) || "IN_USO".equalsIgnoreCase(nuovoStato)) {
+                ok = true;
+                MezzoDao.setStatusMezzo(idMezzo, nuovoStato);
+            }
+
+            if (ok) {
+                res.status(200);
+                return "Stato aggiornato per il mezzo con ID " + idMezzo + ": " + nuovoStato;
+            } else {
+                res.status(404);
+                return "Mezzo non trovato o aggiornamento fallito";
+            }
+        });
+
     }
 
     //DA RISOLVERE I CORS, PERCHÉ COME PRIMA NON FUNZIONAVA DI NUOVO
+    /**
+     * <h2>Abilita CORS per il server Spark (localhost:3000).</h2>
+     * <p>
+     *     Configura i filtri e gli handler per gestire le richieste CORS.
+     *     In questo caso è impostata la configurazione per permettere le richieste solo dal client specifico, localhost:3000.
+     * </p>
+     */
     private static void enableCORS() {
         final String CLIENT_ORIGIN = "http://localhost:3000";
         // Elenco dei metodi HTTP che il tuo server accetta
@@ -400,6 +635,93 @@ public class Service {
 
         // Non è generalmente necessario un filtro 'after' se la configurazione 'before' e 'options' è corretta.
         // Potrebbe essere utile in scenari più complessi o per header specifici da aggiungere alla fine.
+
+        //Questa configurazione CORS permette al server di rispondere solo alle richieste provenienti da http://localhost:3000.
+        //Questo per evitare che altri client possano fare richieste al server.
+
+        //Nel caso bisognasse gestire eventuali credenziali (come i cookie) bisogna effettuare eventualmente una fetch così:
+        /*
+            fetch("http://<ip-del-server>:4567/api/...", {
+                method: "POST",
+                credentials: "include", // Necessario per cookie o sessioni
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dati),
+            });
+        */
+    }
+
+    /**
+     * <h2>Abilitazione CORS per il server Sparck (chiunque con gestione cookie).</h2>
+     * <p>
+     *   Questa funzione abilita CORS per il server Spark, permettendo richieste da qualsiasi origine.
+     * </p>
+     */
+    private static void enableCORS_public() {
+        final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
+
+        before((request, response) -> {
+            String origin = request.headers("Origin");
+            if (origin != null) {
+                response.header("Access-Control-Allow-Origin", origin); // Riflette l'origine che ha fatto la richiesta
+                response.header("Access-Control-Allow-Credentials", "true");
+            }
+        });
+
+        options("/*", (request, response) -> {
+            String origin = request.headers("Origin");
+            if (origin != null) {
+                response.header("Access-Control-Allow-Origin", origin);
+                response.header("Access-Control-Allow-Credentials", "true");
+
+                String requestHeaders = request.headers("Access-Control-Request-Headers");
+                if (requestHeaders != null) {
+                    response.header("Access-Control-Allow-Headers", requestHeaders);
+                } else {
+                    response.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                }
+
+                String requestMethod = request.headers("Access-Control-Request-Method");
+                if (requestMethod != null) {
+                    response.header("Access-Control-Allow-Methods", requestMethod);
+                } else {
+                    response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
+                }
+
+                response.status(204);
+                return "";
+            } else {
+                response.status(403);
+                return "CORS origin denied";
+            }
+        });
+    }
+
+    /**
+     * <h2>Abilitazione CORS per il server Sparck (chiunque senza gestione cookie).</h2>
+     * <p>
+     *   Questa funzione abilita CORS per il server Spark, permettendo richieste da qualsiasi origine.
+     * </p>
+     */
+    private static void enableCORS_public2() {
+        final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
+
+        before((request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*"); // Tutti i domini possono accedere
+            response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
+            response.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        });
+
+        options("/*", (request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
+            response.header("Access-Control-Allow-Headers", request.headers("Access-Control-Request-Headers") != null
+                    ? request.headers("Access-Control-Request-Headers")
+                    : "Content-Type, Authorization");
+            response.status(204); // No Content
+            return "";
+        });
     }
 
     // Classi di supporto per le risposte JSON (possono essere esterne o interne)

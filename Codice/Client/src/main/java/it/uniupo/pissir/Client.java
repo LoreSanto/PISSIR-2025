@@ -3,7 +3,9 @@ package it.uniupo.pissir;
 import it.uniupo.pissir.controller.corsa.CorsaController;
 import it.uniupo.pissir.controller.gestore.GestoreController;
 import it.uniupo.pissir.controller.mezzo.MezzoController;
+import it.uniupo.pissir.controller.pagamento.PagamentoController;
 import it.uniupo.pissir.controller.parcheggio.ParcheggioController;
+import it.uniupo.pissir.controller.utente.UtenteController;
 import spark.Spark;
 import static spark.Spark.port;
 
@@ -32,11 +34,15 @@ public class Client {
 
         //Login
         Spark.get("/login", LoginController.serveLoginPage);
-        Spark.post("/login", LoginController.handleLoginPost);
+        Spark.post("/login", LoginController.handleLoginPost);//Trasformata per bene in post e controllata da java per la creazione della sessione
 
         //Profilo Utilizzatore
         Spark.get("/profilo", ProfiloController.serveProfiloPage);
-        Spark.post("/aggiornaProfiloRicarica", ProfiloController.handleAggiornaProfiloRicaricaPost);
+        //da richiamare ogni qual volta si effettua un'azione che modifica la ricarica del profilo
+        Spark.post("/aggiornaProfiloRicarica", ProfiloController.handleAggiornaProfiloRicaricaPost);//Questo è da toglire
+        Spark.post("/aggiornoPuntiCreditoUtente", PagamentoController.handleAggiornamentoPuntiCreditoUtentePost);
+        //Check in locale per vedere se basta il credito
+        Spark.post("/checkCreditoUtente", ProfiloController.handleCheckCreditoUtentePost);
 
         //Profilo Utilizzatore Sospeso
         Spark.get("/profiloSospeso", ProfiloController.serveProfiloSospesoPage);
@@ -69,6 +75,10 @@ public class Client {
         Spark.get("/corsaAttuale", CorsaController.serveCorsaAttualePage);
 
         //Richiesta di noleggio di un mezzo
+        //Per il momento è gestito dal server la possibilità che l'utente abbia già noleggiato un mezzo
         Spark.post("/noleggioMezzo", MezzoController.handleRichiestaNoleggioPost);
+
+        //Richiesta mail della sessione (da mettere anche in altre operazioni dove richiede la mail)
+        Spark.get("/sessione/mail", UtenteController.getSessionEmail);
     }
 }

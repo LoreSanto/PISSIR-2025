@@ -38,4 +38,21 @@ public class ParcheggioDao {
         System.out.println("Numero parcheggi trovati: " + parcheggi.size());
         return parcheggi;
     }
+
+    //Aggiunge un nuovo parcheggio
+    public static boolean addParcheggio(String nome, int capienzaMassima, String zona) {
+        String sql = "INSERT INTO Parcheggio (nome, numero_posti, zona)" +
+                "VALUES (?, ?, (SELECT nome FROM Zona WHERE nome = ?))";
+
+        try (Connection conn = DbConnect.getInstance().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, nome);
+            st.setInt(2, capienzaMassima);
+            st.setString(3, zona);
+            int rowsAffected = st.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

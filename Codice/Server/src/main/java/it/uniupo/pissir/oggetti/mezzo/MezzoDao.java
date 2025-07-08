@@ -166,4 +166,64 @@ public class MezzoDao {
         }
 
     }
+
+    public static boolean addMezzo(String tipo, int batteria, String parcheggio, String codice_IMEI) {
+        if (batteria != -1) {
+            final String sql = "INSERT INTO Mezzo (tipo, status, parcheggio, batteria, codice_IMEI) VALUES (?, 'PRELEVABILE', (SELECT nome FROM Parcheggio WHERE nome = ?), ?, ?)";
+            try (Connection conn = DbConnect.getInstance().getConnection();
+                 PreparedStatement st = conn.prepareStatement(sql)) {
+                st.setString(1, tipo);
+                st.setString(2, parcheggio);
+                st.setInt(3, batteria);
+                st.setString(4, codice_IMEI);
+                st.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            final String sql = "INSERT INTO Mezzo (tipo, status, parcheggio, codice_IMEI) VALUES (?, 'PRELEVABILE', (SELECT nome FROM Parcheggio WHERE nome = ?), ?)";
+            try (Connection conn = DbConnect.getInstance().getConnection();
+                 PreparedStatement st = conn.prepareStatement(sql)) {
+                st.setString(1, tipo);
+                st.setString(2, parcheggio);
+                st.setString(3, codice_IMEI);
+                st.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    public static int getBatteriaById(int idMezzo) {
+        final String sql = "SELECT batteria FROM Mezzo WHERE id_mezzo = ?";
+        try (Connection conn = DbConnect.getInstance().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, idMezzo);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("batteria");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    
+    public static boolean aggiornaBatteria(int idMezzo, int nuovaBatteria) {
+        final String sql = "UPDATE Mezzo SET batteria = ? WHERE id_mezzo = ?";
+        try (Connection conn = DbConnect.getInstance().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, nuovaBatteria);
+            st.setInt(2, idMezzo);
+            st.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

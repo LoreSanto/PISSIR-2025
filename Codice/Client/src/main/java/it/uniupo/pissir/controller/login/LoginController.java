@@ -58,66 +58,71 @@ public class LoginController {
      */
     public static Route handleLoginPost = (Request req, Response res) -> {
 
-        System.out.println("Richiesta accesso alla pagina profilo");
+        System.out.println("POST /login");
 
-        // Ottengo email e password dal form
-        String email = req.queryParams("email");
-        String password = req.queryParams("password");
+        // Parso il body JSON
+        Map<String, String> dati = new Gson().fromJson(req.body(), Map.class);
+        String email = dati.get("email");
+        String password = dati.get("password");
 
-        // Messaggio di errore generico per credenziali errate
+        // Endpoint del tuo server REST
+        String apiUrl = "http://localhost:4567/api/v1.0/login";
+
+        RestTemplate restTemplate = new RestTemplate();
         String errorMessage = "Email o password errati.";
 
-        // Utilizzo RestTemplate per chiamare il backend REST
-        RestTemplate restTemplate = new RestTemplate();
-
-        // Costruisco la URL per fare login
-        String apiUrl = "http://localhost:4567/api/v1.0/login?email=" + email + "&password=" + password;
-
-
         try {
-            // Effettuo la richiesta GET per verificare le credenziali
-            //ResponseEntity<String> apiResponse = restTemplate.getForEntity(apiUrl, String.class);
+            // Preparo il body da inviare al backend (POST JSON)
+            Map<String, String> body = new HashMap<>();
+            body.put("email", email);
+            body.put("password", password);
 
-            Map<String, Object> utente = restTemplate.getForObject(apiUrl, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
 
-            System.out.println("Richiesta GET alla REST API: " + apiUrl);
+            // Chiamo il backend con POST
+            ResponseEntity<Map> apiResponse = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, Map.class);
+            Map<String, Object> utente = apiResponse.getBody();
 
-
-            if (utente != null && utente.get("email") != null) {
-                req.session(true).attribute("utente", utente);
-
-                System.out.println(utente.get("tipo"));
-
-                if (utente.get("tipo").toString().equals("admin")) {
-                    System.out.println("L'utente è un amministratore");
-                    req.session().attribute("admin", true);
-                    res.redirect("/profiloAdmin");
-                } else {
-                    System.out.println("L'utente è uno user");
-                    res.redirect("/profilo");
-                }
-
-                req.session().attribute("errorMessage", "");
-                return null;
-            } else {
-                req.session().attribute("errorMessage", errorMessage);
-                req.session().attribute("email", email);
-                res.redirect("/login");
+            if (utente == null || utente.get("email") == null) {
+                res.status(401);
+                Map<String, String> errorMap = new HashMap<>();
+                errorMap.put("error", errorMessage);
+                return new Gson().toJson(errorMap);
             }
 
+            // Creo sessione
+            req.session(true).attribute("utente", utente);
+
+            String tipo = (String) utente.get("tipo");
+
+            Map<String, String> redirectMap = new HashMap<>();
+            if ("admin".equals(tipo)) {
+                req.session().attribute("admin", true);
+                res.status(200);
+                redirectMap.put("redirect", "/profiloAdmin");
+            } else {
+                res.status(200);
+                redirectMap.put("redirect", "/profilo");
+            }
+
+            return new Gson().toJson(redirectMap);
 
         } catch (HttpClientErrorException e) {
-            // Errore: credenziali non valide o altro errore HTTP (es. 401 Unauthorized)
+            res.status(401);
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("error", errorMessage);
+            return new Gson().toJson(errorMap);
 
-            // Salvo in sessione il messaggio e il campo email per ripopolare il form
-            req.session().attribute("errorMessage", errorMessage);
-            req.session().attribute("email", email);
-
-            // Redirezione alla pagina login
-            res.redirect("/login");
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.status(500);
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("error", "Errore del server, riprova più tardi.");
+            return new Gson().toJson(errorMap);
         }
 
-        return null;
     };
 
 }

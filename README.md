@@ -28,11 +28,24 @@ Il modulo Server utilizza: temurin-17 Eclipse Temurin version 17.0.7
 Nel caso si creassero delle cartelle, bisogna caricarci dentro un qualsiasi tipo di file per essere preso anche dal Git, altrimenti non lo carica.
 
 ## SETUP PER AVVIARE
+Il progetto è formato da due parti distinte Server e client.
+Per avviare il progetto bisogna aprire in due finestre separate su IntelliJ le cartelle Client e Server si tuate in /Codice.
 
+All'interno del Client ci sarà il main principale, da eseguire, nella classe Client.java che farà partire la web-app visibile in: http://localhost:3000.
+<br>
+All'interno del Server ci sarà il main principale, da eseguire, nella classe Service.java che farà partire tutta la parte della gestione delle api rest.
+
+Per quanto riguarda l'MQTT è simulato e si trova in /it/uniupo/pissir/mqtt dove ci sono le diverse classi che gestiscono i messaggi, inviano i dati al server e simulano eventuali situazioni come:
+<br>
+-Ricarica della batteria
+<br>
+-Scaricamento della batteria
+<br>
+-Segnalazione di un malfunzionamento
 
 ## Project status
 
-In sviluppo
+In convalidazione
 
 
 ## UTENZE

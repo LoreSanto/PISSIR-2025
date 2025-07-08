@@ -269,12 +269,33 @@ public class UtenteDao {
 
     }
 
+
+    public static boolean convertiPunti(String email, int punti, double importo){
+        final String sql = "UPDATE Utilizzatore SET credito = ?, punti = ? WHERE email = ?";
+
+        try (Connection conn = DbConnect.getInstance().getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+
+            st.setBigDecimal(1, java.math.BigDecimal.valueOf(importo));//converto il double in decimal per il database
+            st.setInt(2, punti);
+            st.setString(3, email);
+
+            int rowsAffected = st.executeUpdate();
+            return rowsAffected > 0; // Ritorna true se almeno una riga è stata aggiornata
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // In caso di errore, ritorna false
+        }
+    }
+
+    //-------------------------------------------------------------------
     /**
      * <h2>Aggiorna dato della ricarica dell'utente</h2>
      * @param email mail dell'utente che richiede la ricarica
      * @return true se l'aggiornamento è andato a buon fine, false altrimenti
      */
-    public static Utente getUtenteUpdateRicarica(String email) {
+    public static Utente getDatiUtenteByMail(String email) {
         final String sql = "SELECT * FROM Utilizzatore WHERE email = ?";
 
         try (Connection conn = DbConnect.getInstance().getConnection();
@@ -285,15 +306,15 @@ public class UtenteDao {
 
             if (rs.next()) {
                 return new Utente(
-                        rs.getString("nome"),
-                        rs.getString("cognome"),
-                        rs.getString("email"),
-                        rs.getString("passwd"),
+                        null,
+                        null,
+                        null,
+                        null,
                         rs.getDouble("credito"),
                         rs.getInt("punti"),
                         rs.getInt("numeroSospensione"),
                         rs.getString("stato"),
-                        "user"
+                        null
                 );
 
             }
@@ -304,6 +325,9 @@ public class UtenteDao {
 
         return null;
     }
+    //-------------------------------------------------------------------
+
+
 
     /**
      * <h2>Verifica che l'utente non sia sospeso</h2>

@@ -25,3 +25,18 @@
     color: #333; /* Colore testo sopra la barra */
     font-weight: 500;
 }
+
+.modal-header, .add-park-spot{
+    background-color: #198754;
+    color: white;
+}
+
+.add-park-spot:hover{
+    background-color: #eef2f3;
+    border-color: #198754;
+}
+
+#addParkingButton{
+    background-color: #198754;
+    color: white;
+}

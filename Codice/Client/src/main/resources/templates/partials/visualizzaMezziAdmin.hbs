@@ -118,4 +118,81 @@
             </div>
         </div>
     </div>
+
+    <div class="text-center my-4">
+        <button class="btn btn-teal-custom btn-lg shadow- add-vehicle-spot" data-bs-toggle="modal" data-bs-target="#addVehicleModal" id="addVehicleButton" onclick="handleNewVehicle();">
+            <i class="bi bi-plus-lg me-2"></i>Aggiungi Nuovo Mezzo
+        </button>
+    </div>
+
+    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addVehicleModalLabel">Aggiungi Nuovo Veicolo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-vehicle-form" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <div id="vehicle-type-selector" class="d-flex justify-content-between gap-2">
+                                <div class="vehicle-option" role="button" data-value="BICICLETTA">
+                                    <i class="material-symbols-outlined">pedal_bike</i>
+                                    <div>Bicicletta</div>
+                                </div>
+                                <div class="vehicle-option" role="button" data-value="BICI_ELETTRICA">
+                                    <i class="material-symbols-outlined">electric_bike</i>
+                                    <div>Bici Elettrica</div>
+                                </div>
+                                <div class="vehicle-option" role="button" data-value="MONOPATTINO">
+                                    <i class="material-symbols-outlined">electric_scooter</i>
+                                    <div>Monopattino</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="vehicle-type" name="vehicle-type" required>
+                            <div class="invalid-feedback d-none" id="vehicle-type-error">
+                                Per favore, seleziona un tipo di veicolo.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="parking" class="form-label">Parcheggio</label>
+                            <input type="text" class="form-control" id="parking" placeholder="Parcheggio" required>
+                        </div>
+
+                        <div class="mb-3" id="battery-level-container">
+                            <label for="battery-level" class="form-label">Livello di batteria (%)</label>
+                            <input type="number" class="form-control" id="battery-level" placeholder="%" min="0" max="100" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imei" class="form-label">Codice IMEI</label>
+                            <input type="text" class="form-control" id="imei" placeholder="IMEI" required>
+                        </div>
+                    </form>
+                </div>
+                <div id="vehicleMessage" class="mt-3"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" form="add-vehicle-form" class="btn btn-custom-green" id="save-vehicle-btn">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Salva Veicolo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header" id="toast-header">
+                <strong class="me-auto" id="toast-title"></strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toast-body">
+            </div>
+        </div>
+    </div>
 </section>

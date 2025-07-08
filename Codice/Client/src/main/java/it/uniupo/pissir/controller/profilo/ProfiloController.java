@@ -133,4 +133,29 @@ public class ProfiloController {
             return "Sessione non trovata o email non corrispondente";
         }
     };
+
+    /**
+     * <h2>Controlla il credito dell'utente per il pagamento di una corsa.</h2>
+     *
+     * <p>
+     * Questa funzione controlla se l'utente ha abbastanza credito per pagare una corsa.
+     * Se il credito è sufficiente, restituisce un messaggio di successo, altrimenti richiede una ricarica.
+     * </p>
+     */
+    public static Route handleCheckCreditoUtentePost= (Request req, Response res) -> {;
+
+        //dobbiamo ricevere il costo della corsa da pagare
+        double costo = Double.parseDouble(req.queryParams("costo").toString());
+
+        Map<String, Object> sessionData = req.session().attribute("utente");
+        Double creditoAttuale = Double.parseDouble(sessionData.get("credito").toString());
+
+        if (costo+1 <= creditoAttuale) {
+            res.status(200);
+            return "possibile effettuare pagamento";
+        } else {
+            res.status(400);
+            return "richiesta ricarica";
+        }
+    };
 }

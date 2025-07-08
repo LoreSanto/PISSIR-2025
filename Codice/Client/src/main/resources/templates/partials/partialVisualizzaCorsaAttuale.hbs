@@ -1,0 +1,501 @@
+<section class="main-content container">
+{{#if corsa}}
+    <div class="details-container" data-id-corsa="{{corsa.id}}"></div>
+    <script>
+
+        creditoInsf = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tempoElement = document.getElementById('tempo-trascorso');
+            const costoElement = document.getElementById('costo-totale');
+
+            const costoCredInsElement = document.getElementById('costo-totale-credito-ins');
+
+            if (!tempoElement || !costoElement) return;
+
+            const dataPartenzaString = "{{corsa.dataPartenza}}";
+            const dataPartenza = new Date(dataPartenzaString.replace(" ", "T") + "Z");
+
+            const tariffaAlMinuto = 0.10;
+
+            function aggiornaTempoECosto() {
+                const oraCorrente = new Date();
+                const diffMs = oraCorrente - dataPartenza;
+
+                if (diffMs < 0) {
+                    tempoElement.textContent = "0 min";
+                    costoElement.textContent = "€0.00";
+                    return;
+                }
+
+                const diffMinutiTotali = diffMs / 60000.0; // minuti con decimali
+                const minutiInteri = Math.floor(diffMinutiTotali);
+                const ore = Math.floor(minutiInteri / 60);
+                const minuti = minutiInteri % 60;
+
+                // Formattazione tempo
+                const tempoFormattato = ore > 0 ? `${ore}h ${minuti}min` : `${minuti} min`;
+                tempoElement.textContent = tempoFormattato;
+
+                // Calcolo costo con 5 euro fissi + 0.10 euro al minuto dopo i primi 30 minuti
+                let costo = 5;
+                if (diffMinutiTotali > 30) {
+                    costo += (diffMinutiTotali - 30) * 0.10;
+                }
+                costoElement.textContent = `€${costo.toFixed(2)}`;
+
+                if(creditoInsf){
+                    costoCredInsElement.textContent = `€${costo.toFixed(2)}`;
+                }
+            }
+
+            aggiornaTempoECosto(); // prima chiamata immediata
+            setInterval(aggiornaTempoECosto, 1000); // ogni secondo
+        });
+
+        async function confirmEndRide() {
+            const parcheggioFine = document.getElementById("parking-location").value;
+            const faultYes = document.getElementById("faultYes").checked;
+            const guasto = faultYes ? "yes" : "no";
+            const idCorsa = document.querySelector('.details-container').getAttribute('data-id-corsa');
+
+            const messageDiv = document.getElementById("message-container");
+
+            if (!parcheggioFine) {
+                alert("Seleziona un parcheggio.");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:4567/api/v1.0/terminaCorsa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        id_corsa: idCorsa,
+                        parcheggio_fine: parcheggioFine,
+                        guasto: guasto
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const result = await response.text();
+
+                messageDiv.innerHTML = `<div class="alert alert-success">Pagamento terminato con successo!</div>`;
+
+                try {
+                    const aggiornaResponse = await fetch('/aggiornoPuntiCreditoUtente', {
+                        method: 'POST'
+                    });
+                    if (!aggiornaResponse.ok) {
+                        console.warn('Errore durante aggiornamento dati utente');
+                    } else {
+                        console.log('Utente aggiornato correttamente');
+                    }
+                } catch (err) {
+                    console.error('Errore di rete durante aggiornamento utente:', err);
+                }
+
+
+                setTimeout(() => {
+                    window.location.href = "/profilo";
+                }, 2000);
+
+            } catch (error) {
+                console.error("Errore durante la terminazione della corsa:", error);
+                if (messageDiv) {
+                    messageDiv.innerHTML = `<div class="alert alert-danger">Errore durante il pagamento!</div>`;
+                }
+            }
+        }
+
+        //Funzione per mostrare il modal di ricarica e verificare il credito
+        async function checkCreditoEOppendiModal() {
+            // Prendo il costo visualizzato nel modal (assumendo che ci sia un elemento con id 'costo-totale')
+            const costoText = document.getElementById('costo-totale')?.innerText;
+            if (!costoText) {
+                alert('Errore: costo non disponibile');
+                return;
+            }
+            const costo = parseFloat(costoText.replace('€', '').trim());
+            if (isNaN(costo)) {
+                alert('Errore: costo non valido');
+                return;
+            }
+
+            try {
+                const response = await fetch('/checkCreditoUtente', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ costo: costo.toString() })
+                });
+
+                if (response.ok) {
+                    // Se credito sufficiente, mostra modal fine corsa
+                    creditoInsf = 0;
+                    const endRideModal = new bootstrap.Modal(document.getElementById('endRideModal'));
+                    endRideModal.show();
+                } else {
+                    // Se credito insufficiente, mostra modal ricarica
+                    creditoInsf = 1;
+                    const rechargeModal = new bootstrap.Modal(document.getElementById('ricaricaAndRideModal'));
+                    rechargeModal.show();
+                }
+            } catch (error) {
+                alert('Errore di rete, riprova più tardi');
+                console.error(error);
+            }
+        }
+    </script>
+    <!-- Script per il modal di ricarica e fine corsa nel caso di credito troppo basso-->
+    <script>
+        // Funzione per confermare fine corsa nel modal ricaricaAndRideModal
+        async function confirmEndRideRicarica() {
+            const parcheggioFine = document.getElementById("parking-location-ricarica").value;
+            const faultYes = document.getElementById("faultYes-ricarica").checked;
+            const guasto = faultYes ? "yes" : "no";
+            const idCorsa = document.querySelector('.details-container').getAttribute('data-id-corsa');
+
+            const messageDiv = document.getElementById("message-container-ricarica");
+
+            if (!parcheggioFine) {
+                alert("Seleziona un parcheggio.");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:4567/api/v1.0/terminaCorsa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        id_corsa: idCorsa,
+                        parcheggio_fine: parcheggioFine,
+                        guasto: guasto
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const result = await response.text();
+
+                messageDiv.innerHTML = `<div class="alert alert-success">Pagamento terminato con successo!</div>`;
+
+                try {
+                    const aggiornaResponse = await fetch('/aggiornoPuntiCreditoUtente', {
+                        method: 'POST'
+                    });
+                    if (!aggiornaResponse.ok) {
+                        console.warn('Errore durante aggiornamento dati utente');
+                    } else {
+                        console.log('Utente aggiornato correttamente');
+                    }
+                } catch (err) {
+                    console.error('Errore di rete durante aggiornamento utente:', err);
+                }
+
+                setTimeout(() => {
+                    window.location.href = "/profilo";
+                }, 2000);
+
+            } catch (error) {
+                console.error("Errore durante la terminazione della corsa:", error);
+                if (messageDiv) {
+                    messageDiv.innerHTML = `<div class="alert alert-danger">Errore durante il pagamento!</div>`;
+                }
+            }
+        }
+
+        // Funzione per la ricarica nel modal ricaricaAndRideModal
+        async function handleRechargeRicarica() {
+            const amountInput = document.getElementById("rechargeAmount-ricarica");
+            const cardInput = document.getElementById("paymentMethod-ricarica");
+            const messageDiv = document.getElementById("rechargeMessage-ricarica");
+
+            const importo = parseFloat(amountInput.value);
+            const numeroCarta = cardInput.value.trim();
+            const email =  document.getElementById("utenteEmail-ricarica")?.value;
+
+            if (!email) {
+                messageDiv.innerHTML = "<div class='alert alert-danger'>Email utente non trovata. Effettua il login.</div>";
+                return;
+            }
+
+            if (isNaN(importo) || importo <= 0) {
+                messageDiv.innerHTML = "<div class='alert alert-danger'>Inserisci un importo valido.</div>";
+                return;
+            }
+
+            if (numeroCarta.length < 12) {
+                messageDiv.innerHTML = "<div class='alert alert-danger'>Numero di carta non valido.</div>";
+                return;
+            }
+
+            const payload = {
+                email: email,
+                importo: importo
+            };
+
+            try {
+                const response = await fetch("http://localhost:4567/api/v1.0/ricaricaCredito", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const text = await response.text();
+
+                if (response.ok) {
+                    // Aggiorna credito visualizzato
+                    const current = document.getElementById("currentCreditModal-ricarica");
+                    const currentCredit = parseFloat(current.value.replace("€", "").trim());
+                    const nuovoCredito = (currentCredit + importo).toFixed(2);
+                    current.value = `${nuovoCredito} €`;
+                    // Aggiorna anche il credito nel profilo (se presente)
+                    const userCreditElem = document.getElementById("userCredit");
+                    if (userCreditElem) userCreditElem.innerText = `${nuovoCredito} €`;
+
+                    messageDiv.innerHTML = `<div class="alert alert-success">Importo aggiornato con successo!</div>`;
+
+                    try {
+                        const aggiornaResponse = await fetch('/aggiornoPuntiCreditoUtente', {
+                            method: 'POST'
+                        });
+                        if (!aggiornaResponse.ok) {
+                            console.warn('Errore durante aggiornamento dati utente');
+                        } else {
+                            console.log('Utente aggiornato correttamente');
+                        }
+                    } catch (err) {
+                        console.error('Errore di rete durante aggiornamento utente:', err);
+                    }
+
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("ricaricaAndRideModal"));
+                        modal.hide();
+                    }, 1500);
+
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-danger">${text}</div>`;
+                }
+            } catch (err) {
+                console.error("Errore nella richiesta di ricarica:", err);
+                messageDiv.innerHTML = `<div class="alert alert-danger">Errore di rete. Riprova.</div>`;
+            }
+        }
+    </script>
+    <div class="card ride-details-card">
+        <div class="row g-0">
+
+            <!-- Vehicle Image -->
+            <div class="col-lg-5 corsa-image-container">
+                    <img src="{{corsa.mezzo.tipo}}.jpg"
+
+                        alt="{{corsa.mezzo.tipo}}"
+                    class="corsa-image">
+                </div>
+
+                <!-- Ride Details -->
+                <div class="col-lg-7">
+                    <div class="details-container">
+                        <h2 class="details-header">{{corsa.mezzo.tipo}} #{{corsa.mezzo.id}}</h2>
+                        <div class="row g-3 text-center">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="fas fa-battery-three-quarters fa-2x mb-2 info-icon"></i>
+                                    <div class="info-label">Batteria</div>
+                                    <div class="info-value">{{corsa.mezzo.batteria}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="fas fa-map-pin fa-2x mb-2 info-icon"></i>
+                                    <div class="info-label">Partenza</div>
+                                    <div class="info-value">{{corsa.partenza.nome}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="fas fa-clock fa-2x mb-2 info-icon"></i>
+                                    <div class="info-label">Orario Inizio</div>
+                                    <div class="info-value">{{corsa.dataPartenza}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <i class="fas fa-route fa-2x mb-2 info-icon"></i>
+                                    <div class="info-label">Tempo Trascorso</div>
+                                    <div class="info-value" id="tempo-trascorso">0 min</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="button" class="btn btn-danger btn-lg px-5 py-3" onclick="checkCreditoEOppendiModal()">
+                                <i class="fas fa-stop-circle me-2"></i> Termina Corsa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- End Ride Modal -->
+    <div class="modal fade" id="endRideModal" tabindex="-1" aria-labelledby="endRideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="endRideModalLabel"><i class="fas fa-flag-checkered me-2"></i>Conferma Fine Corsa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="end-ride-form">
+                        <div class="mb-4">
+                            <label for="parking-location" class="form-label"><strong>Seleziona il parcheggio di arrivo</strong></label>
+                            <select class="form-select form-select-lg" id="parking-location" required>
+                                <option class="parking-spot" value="" disabled selected>Scegli un'opzione...</option>
+                                <option class="parking-spot" value="Parcheggio A">Parcheggio A </option>
+                                <option class="parking-spot" value="Parcheggio B">Parcheggio B</option>
+                                <option class="parking-spot" value="Parcheggio C">Parcheggio C</option>
+                                <option class="parking-spot" value="Parcheggio D">Parcheggio D</option>
+                                <option class="parking-spot" value="Parcheggio E">Parcheggio E</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label d-block mb-3"><strong>Il mezzo presenta un guasto?</strong></label>
+                            <div class="row g-3 fault-options">
+                                <div class="col">
+                                    <input class="form-check-input" type="radio" name="faultOptions" id="faultNo" value="no" checked>
+                                    <label class="form-check-label" for="faultNo">
+                                        <i class="fas fa-check-circle me-2"></i>NO
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <input class="form-check-input" type="radio" name="faultOptions" id="faultYes" value="yes">
+                                    <label class="form-check-label" for="faultYes">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>SÍ
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="text-center price-display">
+                        <div class="price-label">COSTO TOTALE</div>
+                        <div class="price-value" id="costo-totale">€0.00</div>
+                    </div>
+
+                    <div id="message-container" class="text-center mb-3"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-success px-4" onclick="confirmEndRide()">
+                        <i class="fas fa-credit-card me-2"></i>Paga e Termina
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ricarica & Termina Corsa -->
+    <div class="modal fade" id="ricaricaAndRideModal" tabindex="-1" aria-labelledby="ricaricaAndRideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ricaricaAndRideModalLabel"><i class="bi bi-credit-card-2-front-fill me-2"></i> Ricarica Credito & Termina Corsa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex gap-4">
+                    <!-- SINISTRA: FORM FINE CORSA -->
+                    <div style="flex:1;">
+                        <form id="end-ride-form-ricarica">
+                            <div class="mb-4">
+                                <label for="parking-location-ricarica" class="form-label"><strong>Seleziona il parcheggio di arrivo</strong></label>
+                                <select class="form-select form-select-lg" id="parking-location-ricarica" required>
+                                    <option value="" disabled selected>Scegli un'opzione...</option>
+                                    <option value="Parcheggio A">Parcheggio A</option>
+                                    <option value="Parcheggio B">Parcheggio B</option>
+                                    <option value="Parcheggio C">Parcheggio C</option>
+                                    <option value="Parcheggio D">Parcheggio D</option>
+                                    <option value="Parcheggio E">Parcheggio E</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label d-block mb-3"><strong>Il mezzo presenta un guasto?</strong></label>
+                                <div class="row g-3 fault-options">
+                                    <div class="col">
+                                        <input class="form-check-input" type="radio" name="faultOptions-ricarica" id="faultNo-ricarica" value="no" checked>
+                                        <label class="form-check-label" for="faultNo-ricarica">
+                                            <i class="fas fa-check-circle me-2"></i>NO
+                                        </label>
+                                    </div>
+                                    <div class="col">
+                                        <input class="form-check-input" type="radio" name="faultOptions-ricarica" id="faultYes-ricarica" value="yes">
+                                        <label class="form-check-label" for="faultYes-ricarica">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>SÍ
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center price-display mb-3">
+                                <div class="price-label">COSTO TOTALE</div>
+                                <div class="price-value" id="costo-totale-credito-ins">€0.00</div> <!-- resta lo stesso -->
+                            </div>
+                            <div id="message-container-ricarica" class="mb-3"></div>
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-success" onclick="confirmEndRideRicarica()">
+                                    <i class="fas fa-credit-card me-2"></i>Termina Corsa
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- DIVISORE -->
+                    <div style="width:1px; background:#ddd;"></div>
+
+                    <!-- DESTRA: FORM RICARICA -->
+                    <div style="flex:1;">
+                        <form id="rechargeForm-ricarica">
+                            <div class="mb-3">
+                                <label for="currentCreditModal-ricarica" class="form-label">Credito Attuale:</label>
+                                <input type="text" class="form-control-plaintext" id="currentCreditModal-ricarica" value="{{credito}} €" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rechargeAmount-ricarica" class="form-label">Importo Ricarica (€):</label>
+                                <input type="number" class="form-control" id="rechargeAmount-ricarica" min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="paymentMethod-ricarica" class="form-label">Numero di carta:</label>
+                                <input type="number" class="form-control" id="paymentMethod-ricarica" required>
+                            </div>
+                            <div id="rechargeMessage-ricarica" class="mb-3"></div>
+                            <input type="hidden" id="utenteEmail-ricarica" value="{{email}}">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-primary" onclick="handleRechargeRicarica()">
+                                    <i class="bi bi-check-circle-fill me-2"></i> Conferma Ricarica
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FUNZIONA -->
+{{else if nessunaCorsa}}
+    <h2 style="text-align: center">Nessuna corsa in corso.</h2>
+{{/if}}
+</section>
