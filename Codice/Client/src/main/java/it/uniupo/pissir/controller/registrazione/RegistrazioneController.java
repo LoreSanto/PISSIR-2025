@@ -46,7 +46,7 @@ public class RegistrazioneController {
         );
     };
 
-    //Rivedere codice
+
     /**
      * <h2>Gestisce la registrazione dell'utente.</h2>
      *

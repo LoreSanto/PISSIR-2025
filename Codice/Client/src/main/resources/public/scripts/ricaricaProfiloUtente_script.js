@@ -127,7 +127,6 @@ window.handleConversion = async function () {
 
     try {
         // 5. Invia i dati aggiornati al server per la memorizzazione nel database.
-        //    NOTA: Dovrai creare questo nuovo endpoint sul tuo backend (server porta 4567).
         const response = await fetch("http://localhost:4567/api/v1.0/conversionePunti", {
             method: "POST",
             headers: {

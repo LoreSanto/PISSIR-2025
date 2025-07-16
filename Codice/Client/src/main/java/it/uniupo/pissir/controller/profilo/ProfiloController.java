@@ -50,7 +50,6 @@ public class ProfiloController {
         }
     };
 
-    //Bisogna poi cancellarlo
     /**
      * <h2>Serve la pagina del profilo dell'admin.</h2>
      *
@@ -82,6 +81,15 @@ public class ProfiloController {
 
     };
 
+    /**
+     * <h2>Serve la pagina del profilo sospeso dell'utente.</h2>
+     *
+     * <p>
+     * Questa funzione serve la pagina del profilo per l'utente sospeso.
+     * Quando si prova ad accedere alla pagina del profilo, il sistema porterà l'utente su questa pagina
+     * solamente se l'utente è loggato ed il tipo di utente è "user" e lo stato è "sospeso".
+     * </p>
+     */
     public static Route serveProfiloSospesoPage = (Request req, Response res) -> {
 
         Map<String, Object> userData = req.session().attribute("utente");

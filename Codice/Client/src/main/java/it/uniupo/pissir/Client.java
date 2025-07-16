@@ -39,7 +39,7 @@ public class Client {
         //Profilo Utilizzatore
         Spark.get("/profilo", ProfiloController.serveProfiloPage);
         //da richiamare ogni qual volta si effettua un'azione che modifica la ricarica del profilo
-        Spark.post("/aggiornaProfiloRicarica", ProfiloController.handleAggiornaProfiloRicaricaPost);//Questo è da toglire
+        Spark.post("/aggiornaProfiloRicarica", ProfiloController.handleAggiornaProfiloRicaricaPost);
         Spark.post("/aggiornoPuntiCreditoUtente", PagamentoController.handleAggiornamentoPuntiCreditoUtentePost);
         //Check in locale per vedere se basta il credito
         Spark.post("/checkCreditoUtente", ProfiloController.handleCheckCreditoUtentePost);

@@ -269,7 +269,13 @@ public class UtenteDao {
 
     }
 
-
+    /**
+     * <h2>Converte i punti in credito</h2>
+     * @param email mail dell'utente che richiede la conversione
+     * @param punti punti da convertire
+     * @param importo importo che l'utente vuole ricaricare
+     * @return true se l'aggiornamento è andato a buon fine, false altrimenti
+     */
     public static boolean convertiPunti(String email, int punti, double importo){
         final String sql = "UPDATE Utilizzatore SET credito = ?, punti = ? WHERE email = ?";
 
@@ -290,6 +296,7 @@ public class UtenteDao {
     }
 
     //-------------------------------------------------------------------
+
     /**
      * <h2>Aggiorna dato della ricarica dell'utente</h2>
      * @param email mail dell'utente che richiede la ricarica

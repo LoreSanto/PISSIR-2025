@@ -39,7 +39,6 @@ async function caricaEProcessaDatiUtenti() {
 
     } catch (errore) {
         console.error("Impossibile recuperare i dati degli utenti:", errore);
-        // Potresti voler mostrare un messaggio di errore all'utente qui
         if (noResultsMessageEl) {
             noResultsMessageEl.textContent = "Errore nel caricamento dei dati degli utenti.";
             noResultsMessageEl.style.display = 'block';
@@ -53,7 +52,6 @@ async function caricaEProcessaDatiUtenti() {
 
 // Funzione per aggiornare le statistiche
 function updateStats() {
-    // Assicurati che gli elementi esistano prima di provare ad accedervi
     if (!totalUsersEl || !activeUsersEl || !suspendedUsersEl) return;
 
     // Filtra solo se datiRichiesti è popolato e non è null
@@ -66,7 +64,6 @@ function updateStats() {
 
 // Funzione per renderizzare la tabella degli utenti
 function renderUserTable() {
-    // Assicurati che gli elementi esistano
     if (!tableBody || !noResultsMessageEl) return;
 
     tableBody.innerHTML = ''; // Pulisce la tabella
@@ -83,7 +80,7 @@ function renderUserTable() {
         } else {
             noResultsMessageEl.style.display = 'none';
         }
-        updateStats(); // Aggiorna le statistiche (probabilmente a zero)
+        updateStats(); // Aggiorna le statistiche
         return;
     }
 
@@ -127,7 +124,7 @@ function renderUserTable() {
             toggleButton.classList.add('btn-success');
             toggleButton.innerHTML = '<i class="fas fa-user-check"></i> Attiva';
         }
-        toggleButton.addEventListener('click', () => toggleUserStatus(user.email)); // Assumi che toggleUserStatus esista
+        toggleButton.addEventListener('click', () => toggleUserStatus(user.email));
         actionCell.appendChild(toggleButton);
     });
     updateStats();
@@ -152,7 +149,7 @@ async function updateUserOnServer(email, nuovoStato, sospensioni) {
             headers: {
                 'Content-Type': 'application/json', // Indica che il corpo della richiesta è JSON
             },
-            body: JSON.stringify(payload) // Converti l'oggetto JavaScript in una stringa JSON
+            body: JSON.stringify(payload) // Converte l'oggetto JavaScript in una stringa JSON
         });
 
         // Controlla se la richiesta è andata a buon fine (status code 2xx)
@@ -239,7 +236,7 @@ function showCustomAlert(message, type) {
             position: 'fixed',
             top: '80px', // O altra posizione desiderata
             right: '20px',
-            zIndex: '1050', // Assicurati sia sopra altri elementi
+            zIndex: '1050',
             width: 'auto',
             maxWidth: '400px'
         });
@@ -289,6 +286,5 @@ document.addEventListener('DOMContentLoaded', () => {
         caricaEProcessaDatiUtenti();
     } else {
         console.error("Alcuni elementi del DOM non sono stati trovati. L'applicazione potrebbe non funzionare correttamente.");
-        // Potresti voler mostrare un messaggio di errore più visibile all'utente qui
     }
 });

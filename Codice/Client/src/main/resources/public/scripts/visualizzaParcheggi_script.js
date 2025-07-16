@@ -149,7 +149,6 @@ async function addParkingSpot() {
 
     try {
         // 5. Invia i dati al server con l'API Fetch
-        // IMPORTANTE: Sostituisci '/api/parcheggi' con l'URL corretto del tuo endpoint sul server!
         const response = await fetch('http://localhost:4567/api/v1.0/addParcheggio', {
             method: 'POST',
             headers: {

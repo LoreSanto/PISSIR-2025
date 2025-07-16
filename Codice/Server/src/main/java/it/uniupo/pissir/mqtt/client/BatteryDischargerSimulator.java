@@ -16,23 +16,6 @@ public class BatteryDischargerSimulator {
             MqttClient client = new MqttClient(broker, MqttClient.generateClientId(), new MemoryPersistence());
             client.connect();
 
-            //RestTemplate restTemplate = new RestTemplate();
-
-            /* Da qui si può recuperare la batteria dal DB, ma per la simulazione metto un valore fisso essendo che il dispositivo conosce da se la batteria del proprio mezzo
-            int batteria=0;
-            try{
-                String getUrl = "http://localhost:4567/api/v1.0/batteriaMezzo?id_mezzo=" + idMezzo;
-                String risposta = restTemplate.getForObject(getUrl, String.class);
-                assert risposta != null;
-                batteria = Integer.parseInt(risposta.replaceAll("[^0-9]", ""));
-                //System.out.println("Senza fare conversioni" + Integer.parseInt(risposta));
-                System.out.println(batteria);
-            }catch (Exception e){
-                System.out.println(e.getMessage() + " Non è possibile recuperare la batteria dal DB");
-                e.printStackTrace();
-            }
-            */
-
             int batteria = 100; // Simulazione con batteria al 100%
 
             System.out.println("🔧 Simulazione avviata per mezzo ID " + idMezzo + " con batteria " + batteria + "%");

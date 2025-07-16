@@ -17,8 +17,6 @@ import it.uniupo.pissir.oggetti.parcheggio.Parcheggio;
 import it.uniupo.pissir.oggetti.parcheggio.ParcheggioDao;
 import it.uniupo.pissir.oggetti.user.*;
 
-//import it.uniupo.pissir.oggetti.utente.Utilizzatore;
-//import it.uniupo.pissir.oggetti.utente.UtenteDao;
 
 public class Service {
 
@@ -26,23 +24,7 @@ public class Service {
         Gson gson = new Gson();
         String baseURL = "/api/v1.0";
 
-        //Per poter accettare le richieste da qualunque dispositivo giri il client
-        //ipAddress("0.0.0.0"); // Imposta l'indirizzo IP del server
         enableCORS();
-        /*
-        * Nelle pagine JS del client bisogna modificare le richieste in questo modo:
-        *
-        * 1-Modificare l'URL di base alla macchina dove gira il server, ad esempio:
-        *
-        *   ... fetch('http://192.168.0.7:4567/api/v1.0/mezziUser');
-        *
-        * 2-Modificare l'url in maniera dinamica, ad esempio:
-        *
-        *   const backendBaseUrl = `${window.location.hostname}:4567`;
-        *   ... fetch(`http://${backendBaseUrl}/api/v1.0/mezziUser`);
-        *
-        * */
-
 
         //Login di un utente
         post( baseURL + "/login", (req, res) -> {
@@ -78,7 +60,6 @@ public class Service {
             }
 
         });
-
 
         //Registrazione di un nuovo utente
         get(baseURL + "/register", (req, res) -> {
@@ -481,7 +462,7 @@ public class Service {
             }
         });
 
-        //termina e  paga la corsa che sista effettuando (link momentaneo get di esempio: http://localhost:4567/api/v1.0/terminaCorsa?id_corsa=17&parcheggio_fine=Parcheggio%20B)
+        //termina e  paga la corsa che sista effettuando
         post(baseURL + "/terminaCorsa", (req,res) ->{
 
             System.out.println("POST TERMINA CORSA");
@@ -545,16 +526,16 @@ public class Service {
         });
 
         //aggiorna lo stato di un mezzo
-        put(baseURL + "/statoMezzo", (req, res) -> {
+        put(baseURL + "/updateStatoMezzo", (req, res) -> {
             System.out.println("PUT STATO MEZZO");
 
             int idMezzo = Integer.parseInt(req.queryParams("id_mezzo"));
 
             String nuovoStato = req.queryParams("stato");
 
-
+            // Controllo che il nuovo stato sia uno di quelli validi
             boolean ok = false;
-            if ("PRELEVABILE".equalsIgnoreCase(nuovoStato) || "NON_DISPONIBILE".equalsIgnoreCase(nuovoStato) || "IN_USO".equalsIgnoreCase(nuovoStato)) {
+            if ("PRELEVABILE".equalsIgnoreCase(nuovoStato) || "NON_DISPONIBILE".equalsIgnoreCase(nuovoStato)) {
                 ok = true;
                 MezzoDao.setStatusMezzo(idMezzo, nuovoStato);
             }
@@ -570,7 +551,7 @@ public class Service {
 
     }
 
-    //DA RISOLVERE I CORS, PERCHÉ COME PRIMA NON FUNZIONAVA DI NUOVO
+
     /**
      * <h2>Abilita CORS per il server Spark (localhost:3000).</h2>
      * <p>
@@ -633,96 +614,9 @@ public class Service {
             return "";
         });
 
-        // Non è generalmente necessario un filtro 'after' se la configurazione 'before' e 'options' è corretta.
-        // Potrebbe essere utile in scenari più complessi o per header specifici da aggiungere alla fine.
 
-        //Questa configurazione CORS permette al server di rispondere solo alle richieste provenienti da http://localhost:3000.
-        //Questo per evitare che altri client possano fare richieste al server.
-
-        //Nel caso bisognasse gestire eventuali credenziali (come i cookie) bisogna effettuare eventualmente una fetch così:
-        /*
-            fetch("http://<ip-del-server>:4567/api/...", {
-                method: "POST",
-                credentials: "include", // Necessario per cookie o sessioni
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(dati),
-            });
-        */
     }
 
-    /**
-     * <h2>Abilitazione CORS per il server Sparck (chiunque con gestione cookie).</h2>
-     * <p>
-     *   Questa funzione abilita CORS per il server Spark, permettendo richieste da qualsiasi origine.
-     * </p>
-     */
-    private static void enableCORS_public() {
-        final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
-
-        before((request, response) -> {
-            String origin = request.headers("Origin");
-            if (origin != null) {
-                response.header("Access-Control-Allow-Origin", origin); // Riflette l'origine che ha fatto la richiesta
-                response.header("Access-Control-Allow-Credentials", "true");
-            }
-        });
-
-        options("/*", (request, response) -> {
-            String origin = request.headers("Origin");
-            if (origin != null) {
-                response.header("Access-Control-Allow-Origin", origin);
-                response.header("Access-Control-Allow-Credentials", "true");
-
-                String requestHeaders = request.headers("Access-Control-Request-Headers");
-                if (requestHeaders != null) {
-                    response.header("Access-Control-Allow-Headers", requestHeaders);
-                } else {
-                    response.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-                }
-
-                String requestMethod = request.headers("Access-Control-Request-Method");
-                if (requestMethod != null) {
-                    response.header("Access-Control-Allow-Methods", requestMethod);
-                } else {
-                    response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
-                }
-
-                response.status(204);
-                return "";
-            } else {
-                response.status(403);
-                return "CORS origin denied";
-            }
-        });
-    }
-
-    /**
-     * <h2>Abilitazione CORS per il server Sparck (chiunque senza gestione cookie).</h2>
-     * <p>
-     *   Questa funzione abilita CORS per il server Spark, permettendo richieste da qualsiasi origine.
-     * </p>
-     */
-    private static void enableCORS_public2() {
-        final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS";
-
-        before((request, response) -> {
-            response.header("Access-Control-Allow-Origin", "*"); // Tutti i domini possono accedere
-            response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
-            response.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        });
-
-        options("/*", (request, response) -> {
-            response.header("Access-Control-Allow-Origin", "*");
-            response.header("Access-Control-Allow-Methods", ALLOWED_METHODS);
-            response.header("Access-Control-Allow-Headers", request.headers("Access-Control-Request-Headers") != null
-                    ? request.headers("Access-Control-Request-Headers")
-                    : "Content-Type, Authorization");
-            response.status(204); // No Content
-            return "";
-        });
-    }
 
     // Classi di supporto per le risposte JSON (possono essere esterne o interne)
     static class SuccessResponse {

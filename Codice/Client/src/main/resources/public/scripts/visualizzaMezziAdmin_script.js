@@ -1,12 +1,13 @@
 // Variabile globale per i dati dei mezzi, inizializzata come array vuoto
 let vehicles = [];
-
+let allParkingSpots = []
 // --- DOM Elements (Elementi del DOM) ---
 const vehicleTableBody = document.getElementById('vehicleTableBody');
 const searchInput = document.getElementById('searchInput');
 const filterType = document.getElementById('filterType');
 const filterZone = document.getElementById('filterZone');
 const filterParking = document.getElementById('filterParking');
+const choseParking = document.getElementById('choseParking');
 const filterStatus = document.getElementById('filterStatus');
 const filterMalfunction = document.getElementById('filterMalfunction');
 const resetFiltersBtn = document.getElementById('resetFiltersBtn');
@@ -17,11 +18,6 @@ const statTotalVehicles = document.getElementById('stat-total-vehicles');
 const statAvailableVehicles = document.getElementById('stat-available-vehicles');
 const statInUseVehicles = document.getElementById('stat-in-use-vehicles');
 const statMalfunctioningVehicles = document.getElementById('stat-malfunctioning-vehicles');
-
-// --- Predefined Parking Spots (Lista Parcheggi Predefinita) ---
-const uniqueParkingSpotsFromData = [...new Set(vehicles.map(v => v.parking).filter(p => p))];
-const additionalParkingSpots = ["Parcheggio A", "Parcheggio B", "Parcheggio C", "Parcheggio D", "Parcheggio E"];
-const predefinedParkingSpots = [...new Set([...uniqueParkingSpotsFromData, ...additionalParkingSpots])].sort();
 
 // Funzione per recuperare e processare i dati dall'URL
 async function caricaEProcessaDatiMezzi() {
@@ -46,14 +42,13 @@ async function caricaEProcessaDatiMezzi() {
         });
 
         // Una volta che i dati sono caricati e processati, renderizza la tabella
-        populateParkingFilter(); // Popola il filtro parcheggi
+        await populateParkingFilter(); // Popola il filtro parcheggi
         sanitizeVehicleData(vehicles);
         updateStats();
         renderTable(vehicles);
 
     } catch (errore) {
         console.error("Impossibile recuperare i dati dei mezzi:", errore);
-        // Potresti voler mostrare un messaggio di errore all'utente qui
         if (noResultsMessageEl) {
             noResultsMessageEl.textContent = "Errore nel caricamento dei dati dei mezzi.";
             noResultsMessageEl.style.display = 'block';
@@ -108,7 +103,7 @@ function renderTable(filteredVehicles) {
         const malfunctionCheckboxDisabled = vehicle.status === "IN_USO" ? 'disabled' : '';
 
 
-        let parkingOptionsHTML = predefinedParkingSpots.map(spot =>
+        let parkingOptionsHTML = allParkingSpots.map(spot =>
             `<option value="${spot}" ${vehicle.parking === spot ? 'selected' : ''}>${spot}</option>`
         ).join('');
 
@@ -208,7 +203,6 @@ async function handleSave(event) {
         button.classList.add('btn-success');
 
         // Aggiorna lo stato nel frontend dopo il salvataggio
-        // Questo è già gestito da handleInputChange, ma è buona norma risincronizzare
         const vehicleInState = vehicles.find(v => v.id === vehicleId);
         if(vehicleInState) {
             Object.assign(vehicleInState, payload); // Aggiorna l'oggetto 'vehicles'
@@ -313,14 +307,39 @@ function applyFilters() {
     renderTable(filteredVehicles);
 }
 
-function populateParkingFilter() {
-    filterParking.innerHTML = '<option value="">Tutti i Parcheggi</option>'; // Opzione default
-    predefinedParkingSpots.forEach(spot => {
-        const option = document.createElement('option');
-        option.value = spot;
-        option.textContent = spot;
-        filterParking.appendChild(option);
-    });
+async function populateParkingFilter() {
+
+    try {
+        const response = await fetch('http://localhost:4567/api/v1.0/parcheggiAdmin');
+        if (!response.ok) {
+            throw new Error(`Errore HTTP: ${response.status}`);
+        }
+        const datiParcheggiRaw = await response.json();
+
+        allParkingSpots = datiParcheggiRaw.map(parcheggio => parcheggio.nome).sort();
+
+        filterParking.innerHTML = '<option value="">Tutti i Parcheggi</option>';
+        choseParking.innerHTML = '<option value="">Tutti i Parcheggi</option>';
+
+        allParkingSpots.forEach(spot => {
+            const option = document.createElement('option');
+            option.value = spot;
+            option.textContent = spot;
+            filterParking.appendChild(option);
+        });
+
+        allParkingSpots.forEach(spot => {
+            const option = document.createElement('option');
+            option.value = spot;
+            option.textContent = spot;
+            choseParking.appendChild(option);
+        });
+
+    } catch (errore) {
+        console.error("Impossibile recuperare i dati dei parcheggi:", errore);
+        filterParking.innerHTML = '<option value="">Errore nel caricamento</option>';
+        filterParking.disabled = true;
+    }
 }
 
 //funzione per aggiungere un nuovo veicolo
@@ -402,7 +421,6 @@ async function handleNewVehicle(){
         saveVehicleBtn.disabled = true;
 
         try {
-            // Sostituisci con l'URL del tuo endpoint API
             const response = await fetch('http://localhost:4567/api/v1.0/addMezzo', {
                 method: 'POST',
                 headers: {
@@ -450,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', applyFilters);
     filterType.addEventListener('change', applyFilters);
     filterZone.addEventListener('change', applyFilters);
-    filterParking.addEventListener('change', applyFilters); // Aggiungi event listener per il nuovo filtro
+    filterParking.addEventListener('change', applyFilters);
     filterStatus.addEventListener('change', applyFilters);
     filterMalfunction.addEventListener('change', applyFilters);
 
@@ -458,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.value = '';
         filterType.value = '';
         filterZone.value = '';
-        filterParking.value = ''; // Resetta anche il filtro parcheggio
+        filterParking.value = '';
         filterStatus.value = '';
         filterMalfunction.value = '';
         applyFilters();

@@ -11,17 +11,17 @@
                 <div class="col-md-4">
                     <label for="filter-type" class="form-label fw-medium">Tipo di Mezzo:</label>
                     <div id="filter-type-buttons" class="btn-group filter-button-group w-100" role="group" aria-label="Filtra per tipo">
-                        <button type="button" class="btn btn-outline-secondary active" data-filter-type="all">Tutti</button>
-                        <button type="button" class="btn btn-outline-secondary" data-filter-type="BICICLETTA"><i class="material-symbols-outlined">pedal_bike</i></button>
-                        <button type="button" class="btn btn-outline-secondary" data-filter-type="BICI_ELETTRICA"><i class="material-symbols-outlined">electric_bike</i></button>
-                        <button type="button" class="btn btn-outline-secondary" data-filter-type="MONOPATTINO"><i class="material-symbols-outlined">electric_scooter</i></button>
+                        <button type="button" class="btn btn-outline-secondary active type" data-filter-type="all">Tutti</button>
+                        <button type="button" class="btn btn-outline-secondary type" data-filter-type="BICICLETTA"><i class="fas fa-bicycle me-1"></i>Bici</button>
+                        <button type="button" class="btn btn-outline-secondary type" data-filter-type="BICI_ELETTRICA"><i class="fas fa-bolt me-1"></i>Bici Elettriche</button>
+                        <button type="button" class="btn btn-outline-secondary type" data-filter-type="MONOPATTINO"><i class="bi bi-scooter"></i> Monopattini</button>
                     </div>
                 </div>
 
                 <div class="col-md-3">
                     <label for="filter-zone" class="form-label fw-medium">Zona:</label>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="filter-zone-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-success dropdown-toggle w-100" type="button" id="filter-zone-button" data-bs-toggle="dropdown" aria-expanded="false">
                             Tutte le Zone
                         </button>
                         <ul id="filter-zone-options" class="dropdown-menu w-100" aria-labelledby="filter-zone-button">
@@ -32,7 +32,7 @@
                 <div class="col-md-3">
                     <label for="filter-parking" class="form-label fw-medium">Parcheggio:</label>
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="filter-parking-button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-success dropdown-toggle w-100" type="button" id="filter-parking-button" data-bs-toggle="dropdown" aria-expanded="false">
                             Tutti i Parcheggi
                         </button>
                         <ul id="filter-parking-options" class="dropdown-menu w-100" aria-labelledby="filter-parking-button">

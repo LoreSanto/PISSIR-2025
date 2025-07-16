@@ -40,17 +40,18 @@ public class SubscribeCallback implements MqttCallback {
                 System.out.println("Batteria aggiornata per mezzo " + idMezzo + ": " + batteria + "%");
 
             } else if (topic.startsWith("mezzo/status/")) {
-                String idMezzo = topic.split("/")[2];
+                String[] parts = topic.split("/");
+                String idMezzo = parts[2];
+                String stato = parts[3];
 
-                if ("malfunction".equalsIgnoreCase(msg)) {
-                    rest.exchange(
-                            "http://localhost:4567/api/v1.0/vehicles?id=" + idMezzo + "&status=0",
-                            HttpMethod.PUT,
-                            HttpEntity.EMPTY,
-                            Void.class
-                    );
-                    System.out.println("Mezzo " + idMezzo + " segnalato come GUASTO.");
-                }
+                rest.exchange(
+                        "http://localhost:4567/api/v1.0/updateStatoMezzo?id_mezzo=" + idMezzo + "&stato=" + stato,
+                        HttpMethod.PUT,
+                        HttpEntity.EMPTY,
+                        Void.class
+                );
+
+                System.out.println("✅ Stato aggiornato per mezzo " + idMezzo + ": " + stato);
 
             }/* else if (topic.equals("parkingLot/sensor")) {
                 Message mqttMessage = gson.fromJson(msg, Message.class);

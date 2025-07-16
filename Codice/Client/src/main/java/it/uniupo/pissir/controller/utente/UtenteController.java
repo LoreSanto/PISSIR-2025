@@ -33,8 +33,4 @@ public class UtenteController {
         return new Gson().toJson(risposta);
     };
 
-    /**
-     * <h2>Ritorna se ha una corsa attuale.</h2>
-     *
-     */
 }

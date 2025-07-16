@@ -295,6 +295,36 @@
             }
         }
     </script>
+    <!-- Script per il caricamento dei singoli parcheggi -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("http://localhost:4567/api/v1.0/parcheggiAdmin")
+                    .then(response => {
+                        if (!response.ok) throw new Error("Errore nella risposta dal server.");
+                        return response.json();
+                    })
+                    .then(parcheggi => {
+                        const plr = document.getElementById("parking-location-ricarica");
+                        const pl = document.getElementById("parking-location");
+
+                        parcheggi.forEach(parcheggio => {
+                            const option1 = document.createElement("option");
+                            option1.value = parcheggio.nome;
+                            option1.textContent = parcheggio.nome;
+                            plr.appendChild(option1);
+
+                            const option2 = document.createElement("option");
+                            option2.value = parcheggio.nome;
+                            option2.textContent = parcheggio.nome;
+                            pl.appendChild(option2);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Errore durante il caricamento dei parcheggi:", error);
+                    });
+        });
+    </script>
+
     <div class="card ride-details-card">
         <div class="row g-0">
 
@@ -365,11 +395,7 @@
                             <label for="parking-location" class="form-label"><strong>Seleziona il parcheggio di arrivo</strong></label>
                             <select class="form-select form-select-lg" id="parking-location" required>
                                 <option class="parking-spot" value="" disabled selected>Scegli un'opzione...</option>
-                                <option class="parking-spot" value="Parcheggio A">Parcheggio A </option>
-                                <option class="parking-spot" value="Parcheggio B">Parcheggio B</option>
-                                <option class="parking-spot" value="Parcheggio C">Parcheggio C</option>
-                                <option class="parking-spot" value="Parcheggio D">Parcheggio D</option>
-                                <option class="parking-spot" value="Parcheggio E">Parcheggio E</option>
+                                <!-- Le opzioni verranno aggiunte qui via JS -->
                             </select>
                         </div>
                         <div class="mb-4">
@@ -423,12 +449,7 @@
                             <div class="mb-4">
                                 <label for="parking-location-ricarica" class="form-label"><strong>Seleziona il parcheggio di arrivo</strong></label>
                                 <select class="form-select form-select-lg" id="parking-location-ricarica" required>
-                                    <option value="" disabled selected>Scegli un'opzione...</option>
-                                    <option value="Parcheggio A">Parcheggio A</option>
-                                    <option value="Parcheggio B">Parcheggio B</option>
-                                    <option value="Parcheggio C">Parcheggio C</option>
-                                    <option value="Parcheggio D">Parcheggio D</option>
-                                    <option value="Parcheggio E">Parcheggio E</option>
+                                    <!-- Le opzioni verranno aggiunte qui via JS -->
                                 </select>
                             </div>
                             <div class="mb-4">

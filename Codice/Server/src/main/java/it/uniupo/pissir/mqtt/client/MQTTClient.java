@@ -26,7 +26,7 @@ public class MQTTClient {
 
             // Iscrizione ai topic MQTT
             client.subscribe("mezzo/batteria/+", 0);
-            client.subscribe("mezzo/status/+", 0);
+            client.subscribe("mezzo/status/+/+", 0);
 
             System.out.println("MQTT Client connesso e iscritto ai topic.");
 

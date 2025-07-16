@@ -23,12 +23,16 @@
     border-color: #198754;
 }
 .filter-button-group .btn:not(.active):hover {
-    background-color: #e9ecef;
+    background-color: #badbcc;
+}
+
+.dropdown-item:hover{
+    background-color: #badbcc;
 }
 
 .rent-button {
-    background-color: #ffc107; /* Yellow color like "Ricarica" */
-    color: #212529; /* Dark text for yellow button */
+    background-color: #ffc107;
+    color: #212529;
     border: none;
     transition: background-color 0.3s ease;
 }
@@ -37,8 +41,19 @@
 }
 .vehicle-image {
     width: 100%;
-    height: 150px; /* Fixed height for images */
-    object-fit: cover; /* Ensures images cover the area without distortion */
+    height: 150px;
+    object-fit: cover;
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
+}
+
+
+#filter-zone-button, #filter-parking-button{
+    border-color: #8c8d91;
+    color: #8c8d91;
+}
+
+#filter-zone-button:hover, #filter-parking-button:hover{
+    background-color: #198754;
+    color: white;
 }

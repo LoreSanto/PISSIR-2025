@@ -4,7 +4,7 @@ Inardi Andrea - 20050110
 Santosuosso Lorenzo - 20050494
 
 
-## SOFTAWARE
+## SOFTWARE
 
 - Intellij
 - MQTTX

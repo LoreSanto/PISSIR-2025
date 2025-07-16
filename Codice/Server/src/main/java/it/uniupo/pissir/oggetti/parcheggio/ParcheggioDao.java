@@ -11,7 +11,11 @@ import java.util.ArrayList;
 
 public class ParcheggioDao {
 
-    //ritorna tutti i parcheggi
+    /**
+     * <h2>Recupera tutti i parcheggi dal database</h2>
+     *
+     * @return una lista di oggetti Parcheggio con i dettagli dei parcheggi e il numero di posti occupati.
+     */
     public static ArrayList<Parcheggio> getAllParcheggi() {
         ArrayList<Parcheggio> parcheggi = new ArrayList<>();
         String sql = "SELECT p.nome, p.numero_posti, p.zona, COUNT(m.id_mezzo) AS posti_occupati " +
@@ -39,7 +43,14 @@ public class ParcheggioDao {
         return parcheggi;
     }
 
-    //Aggiunge un nuovo parcheggio
+    /**
+     * <h2>Aggiunge un nuovo parcheggio al database</h2>
+     *
+     * @param nome il nome del parcheggio da aggiungere.
+     * @param capienzaMassima la capienza massima del parcheggio.
+     * @param zona la zona in cui si trova il parcheggio.
+     * @return true se il parcheggio è stato aggiunto con successo, false altrimenti.
+     */
     public static boolean addParcheggio(String nome, int capienzaMassima, String zona) {
         String sql = "INSERT INTO Parcheggio (nome, numero_posti, zona)" +
                 "VALUES (?, ?, (SELECT nome FROM Zona WHERE nome = ?))";

@@ -42,7 +42,6 @@ async function caricaEProcessaMezzi() {
 
     } catch (errore) {
         console.error("Impossibile recuperare i dati dei mezzi:", errore);
-        // Potresti voler mostrare un messaggio di errore all'utente qui
         if (noResultsComponent) {
             noResultsComponent.textContent = "Errore nel caricamento dei dati dei mezzi.";
             noResultsComponent.style.display = 'block';
@@ -124,7 +123,6 @@ function renderVehicles(vehicles) {
         let rentButtonDisabled = !vehicle.available ? 'disabled' : '';
         let rentButtonClasses = vehicle.available ? 'rent-button' : 'btn-secondary disabled';
 
-        //modifico per eseguire la post da Java al posto che qui nel JS
         card.innerHTML = `
                 <form action="/noleggioMezzo" method="POST" class="selection-card">
                     

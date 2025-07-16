@@ -1,5 +1,6 @@
 // --- Sample Trip Data ---
 let trips = [];
+let allParkingSpots = [];
 
 // --- DOM Elements ---
 const tripsTableBody = document.getElementById('tripsTableBody');
@@ -33,7 +34,7 @@ async function caricaEProcessaDatiCorsa() {
             const datePartenza = new Date(corsa.dataPartenza);
             const dateArrivo = new Date(corsa.dataArrivo);
             const diffMs = dateArrivo - datePartenza;
-            const durata = parseFloat((diffMs / (1000 * 60)).toFixed(2));//cambiato per gestire meglio la visualizzazione
+            const durata = parseFloat((diffMs / (1000 * 60)).toFixed(2));
 
             return {
                 id: corsa.id,
@@ -48,13 +49,12 @@ async function caricaEProcessaDatiCorsa() {
         });
 
         // Una volta che i dati sono caricati e processati, renderizza la tabella
-        populateParkingFilters();
+        await populateParkingFilters();
         updateTripStats(trips);
         renderTripsTable(trips);
 
     } catch (errore) {
         console.error("Impossibile recuperare i dati delle corse:", errore);
-        // Potresti voler mostrare un messaggio di errore all'utente qui
         if (noTripsMessage) {
             noTripsMessage.textContent = "Errore nel caricamento dei dati delle corse.";
             noTripsMessage.style.display = 'block';
@@ -65,9 +65,6 @@ async function caricaEProcessaDatiCorsa() {
         if (statAvgDuration) statAvgDuration.textContent = '0';
     }
 }
-
-// --- Extract unique parking spots for filters ---
-const allParkingSpots = [...new Set(trips.flatMap(trip => [trip.startParking, trip.endParking]))].sort();
 
 // --- Utility Functions ---
 function formatCurrency(amount) {
@@ -168,22 +165,39 @@ function applyTripFilters() {
     updateTripStats(filteredTrips);
 }
 
-function populateParkingFilters() {
-    //filterStartParkingTrips.innerHTML = '<option value="">Tutti i Parcheggi Partenza</option>';
-    allParkingSpots.forEach(spot => {
-        const option = document.createElement('option');
-        option.value = spot;
-        option.textContent = spot;
-        filterStartParkingTrips.appendChild(option);
-    });
+async function populateParkingFilters() {
 
-    //filterEndParkingTrips.innerHTML = '<option value="">Tutti i Parcheggi Arrivo</option>';
-    allParkingSpots.forEach(spot => {
-        const option = document.createElement('option');
-        option.value = spot;
-        option.textContent = spot;
-        filterEndParkingTrips.appendChild(option);
-    });
+    try {
+        const response = await fetch('http://localhost:4567/api/v1.0/parcheggiAdmin');
+        if (!response.ok) {
+            throw new Error(`Errore HTTP: ${response.status}`);
+        }
+        const datiParcheggiRaw = await response.json();
+
+        allParkingSpots = datiParcheggiRaw.map(parcheggio => parcheggio.nome).sort();
+
+        filterStartParkingTrips.innerHTML = '<option value="">Tutti i Parcheggi</option>';
+        filterEndParkingTrips.innerHTML = '<option value="">Tutti i Parcheggi</option>';
+
+        allParkingSpots.forEach(spot => {
+            const option = document.createElement('option');
+            option.value = spot;
+            option.textContent = spot;
+            filterStartParkingTrips.appendChild(option);
+        });
+
+        allParkingSpots.forEach(spot => {
+            const option = document.createElement('option');
+            option.value = spot;
+            option.textContent = spot;
+            filterEndParkingTrips.appendChild(option);
+        });
+
+    } catch (errore) {
+        console.error("Impossibile recuperare i dati dei parcheggi:", errore);
+        filterParking.innerHTML = '<option value="">Errore nel caricamento</option>';
+        filterParking.disabled = true;
+    }
 }
 
 // --- Initial Setup ---
